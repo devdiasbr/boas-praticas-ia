@@ -1861,9 +1861,9 @@ Você roda. O número vem do banco, é reproduzível, é auditável, e nenhum da
 *Escrito para ser conduzido ao vivo. O erro do agente aqui é **previsível**, o que
 permite demonstrá-lo sem ensaio.*
 
-> **Este caso existe como exercício executável em [`hands-on/`](hands-on/)** — chamado,
-> dados, testes e gabarito prontos, rodando com `pytest` e sem infraestrutura. O texto
-> abaixo explica o porquê; a pasta é para a squad fazer.
+> **Existe como exercício executável em [`hands-on/`](hands-on/)**: escopo e templates
+> prontos, para a squad passar os dois ao assistente, fazer o brainstorming e ver a IA
+> preencher a spec e a tarefa. Roda com `pytest`, sem infraestrutura.
 
 **O pedido, como chega:**
 
@@ -1968,17 +1968,20 @@ histórico explicitamente — e é isso que o critério de aceite força.
 
 ### Como conduzir o hands-on — 40 min
 
-| Tempo | O que a squad faz |
-|---|---|
-| 5 min | Recebe só o pedido vago. Ninguém abre o editor |
-| 10 min | Escreve a spec: o que é duplicata, o que é histórico, o que fica fora |
-| 5 min | Triagem das cinco perguntas |
-| 10 min | Delega com a tarefa escrita e recebe o resultado |
-| 10 min | Review com o checklist, e a discussão do que aconteceria sem a nota |
+A squad recebe **dois insumos**: o escopo da tarefa e os templates em branco. Passa os
+dois ao assistente e conduz o fluxo.
 
-> **Divida a turma:** metade recebe a nota de memória, metade não. Os dois grupos
-> entregam código que passa no teste de contagem. Só um preserva a auditoria. Isso
-> demonstra a §5 melhor que qualquer slide.
+| Tempo | Etapa |
+|---|---|
+| 15 min | **Brainstorming** — responder as perguntas em aberto do escopo, sem escrever código |
+| 10 min | **A IA preenche** spec e tarefa a partir do que foi decidido, com a triagem das cinco perguntas |
+| 5 min | **Implementar** e rodar os testes |
+| 10 min | **Verificar** com o checklist e registrar o fato novo na memória |
+
+> **O ponto:** ao final, compare o que está em `saida/` com o esforço que deu para
+> produzir. A spec e a tarefa não custaram tempo extra — são o registro de uma conversa
+> que precisaria acontecer de qualquer forma. A diferença é que agora está escrita,
+> versionada e reutilizável.
 
 ### Adaptação por stack
 
