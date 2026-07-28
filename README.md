@@ -58,7 +58,7 @@ Exemplos de código estão em Python por ser a stack mais comum entre as squads.
 |---|---|---|
 | A | Casos ponta a ponta | O fluxo completo (A.1) + quatro casos de decisão |
 | B | Antipadrões | Índice reverso de erros comuns |
-| C | Ferramentas | Equivalência entre produtos e categorias de apoio |
+| C | Ferramentas | Equivalência, categorias de apoio e roteiro de instalação |
 | D | Cheatsheet | Uma página, para consulta rápida |
 | E | Glossário | |
 | F | Referências | Com status de verificação |
@@ -1940,6 +1940,104 @@ Além do assistente em si, existe uma camada de ferramentas de terceiro que atac
 > Todas as quatro categorias acima têm um ecossistema pesado de conteúdo SEO gerado por IA: artigos com números precisos, conflitantes entre si e sem fonte. Durante a checagem para este documento, uma mesma ferramenta apareceu atribuída a três origens diferentes, e as métricas de adoção divergiam em dezenas de milhares entre artigos.
 >
 > **Vá ao repositório e à documentação oficial.** Contagem de estrela, aliás, não é critério de qualidade — mede atenção, não adequação ao seu problema. É exatamente o caso de aplicar §9: evidência antes de afirmação, inclusive quando a afirmação é sobre a ferramenta que promete resolver tudo.
+
+---
+
+## C.3 Roteiro de instalação
+
+> **Antes de instalar qualquer uma:** meça (§12). A ordem inversa — instalar e depois
+> procurar o ganho — leva a otimizar o que já estava barato. E instale **uma por vez**,
+> com a métrica de decisão escolhida antes (§15).
+
+Comandos conferidos nos repositórios oficiais em 2026-07-28. Confirme na fonte antes de
+rodar: são ferramentas que leem todo o seu código.
+
+### Pré-requisitos
+
+| Ferramenta | Precisa de |
+|---|---|
+| Graphify | Python 3.10+ e `uv` (ou `pipx`) |
+| Headroom | Python 3.13 e `uv` (ou `pip`) |
+| Ponytail | nada — é plugin do assistente |
+| CodeBurn | Node — e **não precisa instalar** |
+
+### Observabilidade de custo — comece por aqui
+
+Não instala nada; roda sob demanda e lê as sessões já gravadas em disco.
+
+```bash
+npx codeburn overview
+```
+
+### Indexação de repositório
+
+⚠️ **O pacote oficial no PyPI é `graphifyy`, com dois "y".** Existem homônimos e clones —
+confirme o dono do repositório antes (§6).
+
+```bash
+uv tool install graphifyy
+```
+
+```bash
+graphify install
+```
+
+Depois disso, `/graphify .` dentro do assistente gera o grafo do projeto atual.
+
+### Compressão de contexto
+
+```bash
+uv tool install --python 3.13 "headroom-ai[all]"
+```
+
+```bash
+headroom wrap claude
+```
+
+**Atenção:** `wrap` não é só instalar — ele altera a configuração do assistente para
+rotear as chamadas por um proxy local. É a mais invasiva das quatro. Faça num ambiente
+onde você consiga reverter, e confirme na documentação como desfazer **antes** de aplicar.
+
+### Ruleset de restrição
+
+Plugin do assistente. **São dois envios separados** — o segundo só funciona depois que o
+primeiro terminar.
+
+```
+/plugin marketplace add DietrichGebert/ponytail
+```
+
+```
+/plugin install ponytail@ponytail
+```
+
+### Como remover — leia antes de instalar
+
+A regra de parada do §15 só é exequível se você souber desfazer. Confirme o caminho de
+volta **antes** de instalar, não depois.
+
+```bash
+uv tool uninstall graphifyy
+```
+
+```bash
+uv tool uninstall headroom-ai
+```
+
+```
+/plugin uninstall ponytail@ponytail
+```
+
+O CodeBurn não precisa de remoção — nunca foi instalado.
+
+O Headroom exige um passo extra: desfazer o `wrap` na configuração do assistente, que a
+desinstalação do pacote não reverte sozinha. Sem isso, você fica com um proxy
+configurado apontando para um binário que não existe mais — e o assistente para de
+responder.
+
+> **Fixe a versão do que for para uso contínuo.** `uvx` e `npx` resolvem a versão mais
+> recente a cada execução, e um *major* novo numa dependência derruba a ferramenta sem
+> aviso, com falha silenciosa (§6).
 
 ---
 
