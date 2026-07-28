@@ -88,11 +88,13 @@ def lay(mi, nome):
 if DARK:
     L_TITULO  = lay(9,  "Title Only")
     L_SUB     = lay(9,  "Title, 1 Column Body Text")
-    L_DIV     = lay(13, "Smart Navy")
+    L_DIV     = lay(13, "Future Blue")   # divisor de secao
+    L_FIM     = lay(13, "Smart Navy")    # encerramento
 else:
     L_TITULO  = lay(3,  "Title Only")
     L_SUB     = lay(3,  "Title, 1 Column Body Text")
-    L_DIV     = lay(13, "Future Blue")
+    L_DIV     = lay(13, "Smart Navy")    # divisor de secao
+    L_FIM     = lay(13, "Future Blue")   # encerramento (padrao do template)
 
 # ---------- helpers ----------
 def rgb(h): return RGBColor.from_string(h)
@@ -464,14 +466,18 @@ for num, t1, t2 in itens:
 rodape(s, "Nenhuma das três depende de instalar nada.")
 notas(s, "Fechar pedindo que escolham UMA e tentem essa semana.")
 
-# 22 Q&A
-s = novo(L_TITULO, "Agora é de vocês")
-txt(s, "30 minutos. Discordar é o melhor uso desse tempo.", M, 2.0, 11, 0.5,
-    size=16, cor=AZUL, bold=True)
+# 22 ENCERRAMENTO  (layout oficial de fechamento do template)
+s = prs.slides.add_slide(L_FIM)
+for ph in list(s.placeholders):
+    if str(ph.placeholder_format.type).startswith(("TITLE", "BODY", "OBJECT", "SUBTITLE")):
+        ph._element.getparent().remove(ph._element)
+txt(s, "Agora é de vocês", M, 2.3, 11, 0.9, size=38, font=FT, bold=True, cor=BRANCO)
+txt(s, "30 minutos. Discordar é o melhor uso desse tempo.", M, 3.25, 11, 0.5,
+    size=16, cor="D6E9F7")
 txt(s, "•  Onde isso não vai funcionar no nosso contexto?\n\n•  O que vocês já fazem que o resto do time deveria copiar?\n\n•  Qual tarefa da sprint serviria de teste?",
-    M, 2.85, 9.0, 1.6, size=14.5, cor=MUTED, space=1.3)
-txt(s, "Material completo e templates: <link do repositório>", M, 5.2, 10, 0.4,
-    size=12, cor=MUTED, italic=True)
+    M, 4.1, 9.5, 1.5, size=14, cor=BRANCO, space=1.3)
+txt(s, "Material completo e templates: <link do repositório>", M, 5.85, 10, 0.4,
+    size=11.5, cor="D6E9F7", italic=True)
 notas(s, "Se travar, comecar pela terceira pergunta: e a mais concreta e sempre destrava.")
 
 prs.save(SAIDA)
