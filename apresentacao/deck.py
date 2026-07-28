@@ -177,15 +177,18 @@ def notas(s, t):
     s.notes_slide.notes_text_frame.text = t
 
 def divisor(letra, titulo_txt, sub):
-    s = prs.slides.add_slide(L_DIV)
+    # Layout de conteudo, NAO os layouts de marca (Smart Navy / Future Blue):
+    # aqueles trazem o logo centralizado e qualquer texto no meio o encobre.
+    s = prs.slides.add_slide(L_TITULO)
     for ph in list(s.placeholders):
         if str(ph.placeholder_format.type).startswith(("TITLE", "BODY", "OBJECT", "SUBTITLE")):
             ph._element.getparent().remove(ph._element)
-    circulo(s, M, 2.55, 1.05, BRANCO)
-    txt(s, letra, M, 2.55, 1.05, 1.05, size=34, font=FT, bold=True, cor=AZUL_E,
+    card(s, M, 2.35, W - 2 * M, 2.3, AZUL)
+    circulo(s, M + 0.55, 3.0, 1.0, BRANCO)
+    txt(s, letra, M + 0.55, 3.0, 1.0, 1.0, size=32, font=FT, bold=True, cor=AZUL_E,
         align=PP_ALIGN.CENTER, anchor=MSO_ANCHOR.MIDDLE)
-    txt(s, titulo_txt, M + 1.5, 2.62, W - M - 2.2, 0.8, size=32, font=FT, bold=True, cor=BRANCO)
-    txt(s, sub, M + 1.5, 3.5, W - M - 2.2, 0.5, size=14.5, cor="D6E9F7", italic=True)
+    txt(s, titulo_txt, M + 2.0, 3.0, W - M - 3.0, 0.7, size=30, font=FT, bold=True, cor=BRANCO)
+    txt(s, sub, M + 2.0, 3.78, W - M - 3.0, 0.5, size=14, cor="D6E9F7", italic=True)
     return s
 
 # =====================================================================
@@ -449,8 +452,8 @@ txt(s, "Trocar de ferramenta não resolve problema de método. Pedido ruim é ru
 notas(s, "Passar rapido. Se perguntarem de Devin: nao uso no dia a dia, mas o criterio da matriz vale igual.")
 
 # 21 SEGUNDA-FEIRA
-s = novo(L_TITULO, "Três coisas para segunda-feira",
-         "Nessa ordem — a primeira sozinha já muda o resultado")
+s = novo(L_TITULO, "Por onde começar",
+         "Três práticas para aplicar já na próxima tarefa — nessa ordem")
 itens = [("1", "Mande o trecho, não o arquivo", "Recorte o traceback e diga o que já verificou."),
          ("2", "Diga como você vai saber que ficou certo", "Uma linha de critério de aceite, junto com o pedido."),
          ("3", "Rode antes de aprovar", "Ler o diff não é revisar. Vale para PR de IA e de gente.")]
@@ -480,7 +483,7 @@ for pergunta, nota in itens_qa:
     if nota:
         txt(s, nota, M + 0.32, y + 0.56, 10.8, 0.3, size=12, cor=MUTED, italic=True)
     y += 1.12
-txt(s, "Material completo e templates: <link do repositório>", M, 5.95, 10, 0.4,
+txt(s, "Material completo e templates: github.com/devdiasbr/boas-praticas-ia", M, 5.95, 10, 0.4,
     size=12, cor=MUTED, italic=True)
 notas(s, "Se travar, comecar pela terceira pergunta: e a mais concreta e sempre destrava.")
 
