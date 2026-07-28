@@ -130,7 +130,7 @@ function secao(numero, titolo, sub) {
     x: M, y: 2.95, w: 9.5, h: 0.95,
     fontFace: FT, fontSize: 48, bold: true, color: C.teal, margin: 0,
   });
-  s.addText("O que mudou no meu jeito de trabalhar — e o que eu ainda erro", {
+  s.addText("Práticas que funcionam — contadas pelo caminho que eu fiz até elas", {
     x: M, y: 4.05, w: 9.5, h: 0.5,
     fontFace: FB, fontSize: 17, color: "9AA4B2", margin: 0,
   });
@@ -156,10 +156,10 @@ function secao(numero, titolo, sub) {
   bloco(s, {
     x: M + 6.15, y: y, w: 5.85, h: h, fill: C.greenLt, line: "C6DECF",
     marca: "✓", cor: C.green, titulo: "O que é",
-    corpo: "Como eu trabalho hoje, na prática.\n\nO que me custou caro aprender.\n\nO que vocês podem roubar de mim já na segunda.",
+    corpo: "Práticas que funcionam, com exemplo real.\n\nO caminho até elas — que no meu caso foi caro.\n\nO que dá para aplicar já na segunda.",
     size: 13.5,
   });
-  s.addText("Se no fim vocês discordarem de mim, ótimo — é para isso que reservei metade do tempo.", {
+  s.addText("Se no fim vocês discordarem, ótimo — é para isso que metade do tempo está reservada.", {
     x: M, y: 4.6, w: W - 2 * M, h: 0.5,
     fontFace: FB, fontSize: 16, color: C.text, margin: 0, italic: true,
   });
@@ -170,13 +170,13 @@ function secao(numero, titolo, sub) {
 // ============ 3. O QUE EU FAZIA ERRADO ============
 {
   const s = novo();
-  titulo(s, "Começo pelo que eu fazia errado");
-  subtitulo(s, "Os três erros que me custaram mais tempo", 1.42);
+  titulo(s, "Três erros que custam caro");
+  subtitulo(s, "Os três eram meus. Pela conversa com outras squads, não eram só meus.", 1.42);
 
   const itens = [
-    ["Colava tudo",       "Log inteiro, arquivo inteiro, “por precaução”.\nAchava que mais contexto = melhor resposta."],
-    ["Pedia vago",        "“Otimiza isso aí.”\nRecebia algo legítimo que eu não podia usar."],
-    ["Aceitava o que vinha", "Estava bem escrito, parecia certo.\nEu não rodava. Descobria no review — ou em produção."],
+    ["Colar tudo",        "Log inteiro, arquivo inteiro, “por precaução”.\nA intuição de que mais contexto = melhor resposta."],
+    ["Pedir vago",        "“Otimiza isso aí.”\nVolta algo legítimo que não dá para usar."],
+    ["Aceitar o que vem", "Bem escrito, parece certo, ninguém roda.\nAparece no review — ou em produção."],
   ];
   let y = 2.0;
   itens.forEach((it, i) => {
@@ -195,7 +195,7 @@ function secao(numero, titolo, sub) {
     });
     y += 1.25;
   });
-  rodape(s, "Nenhum desses erros é sobre a ferramenta. Os três são sobre mim.");
+  rodape(s, "Nenhum dos três é sobre a ferramenta. Os três são sobre método.");
   selo(s);
   s.addNotes("Contar um caso real curto de um dos tres. Vulnerabilidade primeiro: abre a plateia para o resto.");
 }
@@ -203,11 +203,11 @@ function secao(numero, titolo, sub) {
 // ============ 4. A VIRADA ============
 {
   const s = novo(true);
-  s.addText("A virada", {
-    x: M, y: 1.15, w: 8, h: 0.8,
+  s.addText("O gargalo mudou de lugar", {
+    x: M, y: 1.15, w: 10, h: 0.8,
     fontFace: FT, fontSize: 34, bold: true, color: C.light, margin: 0,
   });
-  s.addText("Escrever código deixou de ser o meu gargalo.", {
+  s.addText("Escrever código deixou de ser o gargalo.", {
     x: M, y: 2.15, w: 11.9, h: 0.6,
     fontFace: FT, fontSize: 27, color: C.light, margin: 0,
   });
@@ -216,7 +216,7 @@ function secao(numero, titolo, sub) {
     fontFace: FT, fontSize: 27, bold: true, color: C.teal, margin: 0,
   });
   s.addText(
-    "Quando eu não decido, o modelo decide por mim — por omissão, com confiança, e eu só descubro no code review.",
+    "Quando ninguém decide, o modelo decide — por omissão, com confiança. E isso só aparece no code review.",
     { x: M, y: 4.1, w: 11.3, h: 0.9, fontFace: FB, fontSize: 16, color: "9AA4B2", margin: 0, lineSpacing: 24 }
   );
   selo(s, true);
@@ -226,15 +226,15 @@ function secao(numero, titolo, sub) {
 // ============ 5. MEU CICLO ============
 {
   const s = novo();
-  titulo(s, "Meu ciclo hoje");
+  titulo(s, "O ciclo");
   subtitulo(s, "O mesmo, de tarefa pequena a feature grande — só muda o rigor de cada etapa", 1.42);
 
   const passos = [
-    ["ENTENDO",  "leio antes\nde pedir"],
-    ["ESPECIFICO","escrevo o\ncritério"],
-    ["EXECUTO",  "eu ou o\nagente"],
-    ["VERIFICO", "rodo, não\nleio"],
-    ["REGISTRO", "o que vale\npra próxima"],
+    ["ENTENDER",   "ler antes\nde pedir"],
+    ["ESPECIFICAR","escrever o\ncritério"],
+    ["EXECUTAR",   "pessoa ou\nagente"],
+    ["VERIFICAR",  "rodar, não\nler"],
+    ["REGISTRAR",  "o que vale\npra próxima"],
   ];
   const bw = 2.15, gap = 0.35, y = 2.35;
   let x = (W - (passos.length * bw + (passos.length - 1) * gap)) / 2;
@@ -258,17 +258,17 @@ function secao(numero, titolo, sub) {
     }
     x += bw + gap;
   });
-  s.addText("A etapa 2 é a que eu mais pulava — e é a única que, quando falha, estraga todas as outras.", {
+  s.addText("A etapa 2 é a que mais se pula — e a única que, quando falha, estraga todas as outras.", {
     x: M, y: 4.6, w: W - 2 * M, h: 0.5,
     fontFace: FB, fontSize: 15.5, color: C.text, margin: 0, italic: true,
   });
-  rodape(s, "Antes: eu ia direto de “tenho um problema” para “escreve o código”.");
+  rodape(s, "O atalho comum — e o meu, por muito tempo: pular de “tenho um problema” direto para “escreve o código”.");
   selo(s);
   s.addNotes("Mostrar que o ciclo nao e cerimonia: em tarefa pequena cada etapa leva segundos.");
 }
 
 // ============ 6. SECAO A ============
-secao("A", "Antes de pedir", "A parte que acontece antes de eu digitar qualquer coisa");
+secao("A", "Antes de pedir", "A parte que acontece antes de digitar qualquer coisa");
 
 // ============ 7. CONTEXTO E ORCAMENTO ============
 {
@@ -277,7 +277,7 @@ secao("A", "Antes de pedir", "A parte que acontece antes de eu digitar qualquer 
   const y = 1.7, h = 3.15;
   bloco(s, {
     x: M, y: y, w: 5.85, h: h, fill: C.redLt, line: "F2C8C4", mono: true,
-    marca: "✕", cor: C.red, titulo: "Como eu fazia",
+    marca: "✕", cor: C.red, titulo: "Sem recorte",
     corpo:
       "Aqui o log, me ajuda:\n\n" +
       "09:14:02 INFO  Starting worker\n" +
@@ -288,7 +288,7 @@ secao("A", "Antes de pedir", "A parte que acontece antes de eu digitar qualquer 
   });
   bloco(s, {
     x: M + 6.15, y: y, w: 5.85, h: h, fill: C.greenLt, line: "C6DECF", mono: true,
-    marca: "✓", cor: C.green, titulo: "Como eu faço",
+    marca: "✓", cor: C.green, titulo: "Com recorte",
     corpo:
       "Erro no worker, ~2% dos registros.\n\n" +
       "ValueError: invalid literal\n" +
@@ -317,7 +317,7 @@ secao("A", "Antes de pedir", "A parte que acontece antes de eu digitar qualquer 
   subtitulo(s, "Conversa de 3 horas acumula decisão revogada, tentativa abandonada e arquivo velho", 1.42);
 
   card(s, { x: M, y: 2.1, w: W - 2 * M, h: 1.95, fill: C.soft, line: "E2E5EA" });
-  s.addText("O que eu peço antes de abrir sessão nova:", {
+  s.addText("O que pedir antes de abrir uma sessão nova:", {
     x: M + 0.35, y: 2.3, w: 10, h: 0.35,
     fontFace: FB, fontSize: 14, bold: true, color: C.text, margin: 0,
   });
@@ -331,7 +331,7 @@ secao("A", "Antes de pedir", "A parte que acontece antes de eu digitar qualquer 
     fontFace: FB, fontSize: 19, bold: true, color: C.teal, margin: 0,
   });
   s.addText(
-    "O bloco de decisões descartadas é o que mais me economiza: sem ele, a sessão nova propõe de novo tudo que eu já tinha recusado.",
+    "O bloco de decisões descartadas é o que mais economiza: sem ele, a sessão nova propõe de novo tudo que já tinha sido recusado.",
     { x: M, y: 5.0, w: 11.6, h: 0.7, fontFace: FB, fontSize: 14.5, color: C.muted, margin: 0, lineSpacing: 20 }
   );
   selo(s);
@@ -339,7 +339,7 @@ secao("A", "Antes de pedir", "A parte que acontece antes de eu digitar qualquer 
 }
 
 // ============ 9. SECAO B ============
-secao("B", "Como eu peço", "Onde eu mais mudei — e onde o retorno é mais rápido");
+secao("B", "Como pedir", "Onde o retorno aparece mais rápido");
 
 // ============ 10. CRITERIO DE ACEITE ============
 {
@@ -353,7 +353,7 @@ secao("B", "Como eu peço", "Onde eu mais mudei — e onde o retorno é mais rá
   });
   s.addText(
     "Otimizar em quê? Tempo, memória, número de queries?\n\n" +
-    "Ele escolhe — e devolve algo legítimo, com async, ORM trocado e assinatura nova.\n\n" +
+    "O modelo escolhe — e devolve algo legítimo, com async, ORM trocado e assinatura nova.\n\n" +
     "Não dá pra usar.",
     { x: M + 0.28, y: y + 1.25, w: 5.3, h: 1.9, fontFace: FB, fontSize: 12.5, color: C.text, margin: 0, lineSpacing: 17 }
   );
@@ -382,7 +382,7 @@ secao("B", "Como eu peço", "Onde eu mais mudei — e onde o retorno é mais rá
 {
   const s = novo();
   titulo(s, "Em tarefa grande: plano antes do código");
-  subtitulo(s, "O parágrafo que mais me poupou retrabalho", 1.42);
+  subtitulo(s, "O parágrafo que mais poupa retrabalho", 1.42);
 
   card(s, { x: M, y: 2.1, w: 7.4, h: 2.3, fill: C.dark, line: C.dark });
   s.addText(
@@ -401,17 +401,17 @@ secao("B", "Como eu peço", "Onde eu mais mudei — e onde o retorno é mais rá
     [
       { text: "Corrigir um plano de 10 linhas custa uma frase.", options: { bullet: true, breakLine: true, paraSpaceAfter: 10 } },
       { text: "Corrigir 400 linhas geradas custa a tarefa inteira.", options: { bullet: true, breakLine: true, paraSpaceAfter: 10 } },
-      { text: "“Não mexe no serializers.py, é contrato público” — ele não tinha como saber.", options: { bullet: true } },
+      { text: "“Não mexe no serializers.py, é contrato público” — o modelo não tinha como saber.", options: { bullet: true } },
     ],
     { x: M + 7.9, y: 2.65, w: 4.1, h: 1.9, fontFace: FB, fontSize: 13, color: C.muted, margin: 0, lineSpacing: 17 }
   );
-  rodape(s, "Uso isso sempre que a tarefa passa de um arquivo.");
+  rodape(s, "Vale sempre que a tarefa passa de um arquivo.");
   selo(s);
   s.addNotes("Demonstrar ao vivo se der tempo — e o item mais facil de copiar.");
 }
 
 // ============ 12. SECAO C ============
-secao("C", "O que eu persisto", "Contexto morre com a sessão. O que precisa sobreviver vira arquivo");
+secao("C", "O que persistir", "Contexto morre com a sessão. O que precisa sobreviver vira arquivo");
 
 // ============ 13. CLAUDE.MD ============
 {
@@ -423,16 +423,16 @@ secao("C", "O que eu persisto", "Contexto morre com a sessão. O que precisa sob
   bloco(s, {
     x: M, y: y, w: 5.85, h: h, fill: C.redLt, line: "F2C8C4",
     marca: "✕", cor: C.red, titulo: "Não entra",
-    corpo: "“Usamos Python e FastAPI.”\n“Os testes ficam em tests/.”\n“Escreva código de qualidade.”\n\nEle descobre isso em 2 segundos lendo o repo. Eu pago por essas linhas todo dia.",
+    corpo: "“Usamos Python e FastAPI.”\n“Os testes ficam em tests/.”\n“Escreva código de qualidade.”\n\nO modelo descobre isso em 2 segundos lendo o repo. E o time paga por essas linhas todo dia.",
     size: 13,
   });
   bloco(s, {
     x: M + 6.15, y: y, w: 5.85, h: h, fill: C.greenLt, line: "C6DECF",
     marca: "✓", cor: C.green, titulo: "Entra",
-    corpo: "“app/legacy/ está congelado.”\n“Nunca chame billing direto — o rate limit é compartilhado e derruba geral.”\n“PA = Pedido Antecipado.”\n\nIsso ele nunca descobre sozinho.",
+    corpo: "“app/legacy/ está congelado.”\n“Nunca chame billing direto — o rate limit é compartilhado e derruba geral.”\n“PA = Pedido Antecipado.”\n\nIsso nenhum modelo descobre sozinho.",
     size: 13,
   });
-  s.addText("Teste: se a linha pode ser respondida lendo o README, eu apago.", {
+  s.addText("Teste: se a linha pode ser respondida lendo o README, apague.", {
     x: M, y: 4.95, w: W - 2 * M, h: 0.5,
     fontFace: FB, fontSize: 16, bold: true, color: C.text, margin: 0,
   });
@@ -443,8 +443,9 @@ secao("C", "O que eu persisto", "Contexto morre com a sessão. O que precisa sob
 // ============ 14. OBSIDIAN ============
 {
   const s = novo();
-  titulo(s, "Obsidian: onde guardo o que o código não conta");
-  const y = 1.75, h = 3.05;
+  titulo(s, "Onde mora o que o código não conta");
+  subtitulo(s, "Vault de notas, wiki, ADR no repo — a ferramenta importa menos que o formato", 1.42);
+  const y = 2.0, h = 2.85;
   bloco(s, {
     x: M, y: y, w: 5.85, h: h, fill: C.redLt, line: "F2C8C4",
     marca: "✕", cor: C.red, titulo: "Nota-diário (inútil)",
@@ -458,7 +459,7 @@ secao("C", "O que eu persisto", "Contexto morre com a sessão. O que precisa sob
     size: 12.5,
   });
   s.addText("O título é a afirmação, não o tópico — é por ele que a IA decide se a nota importa.", {
-    x: M, y: 5.05, w: W - 2 * M, h: 0.5,
+    x: M, y: 5.1, w: W - 2 * M, h: 0.5,
     fontFace: FB, fontSize: 15.5, color: C.text, margin: 0, italic: true,
   });
   selo(s);
@@ -468,15 +469,15 @@ secao("C", "O que eu persisto", "Contexto morre com a sessão. O que precisa sob
 // ============ 15. SUPERPOWERS ============
 {
   const s = novo(true);
-  titulo(s, "O que mais mudou meu resultado", { color: C.light });
-  s.addText("Não foi trocar de modelo. Foi colocar método dentro da ferramenta.", {
+  titulo(s, "Método dentro da ferramenta", { color: C.light });
+  s.addText("O que mais muda resultado não é trocar de modelo — é o ciclo deixar de ser opcional.", {
     x: M, y: 1.5, w: 11.9, h: 0.5,
     fontFace: FB, fontSize: 16, color: "9AA4B2", margin: 0, italic: true,
   });
 
   const itens = [
-    ["Superpowers", "Obriga o ciclo: entender → planejar → executar → verificar.\nO agente não avança de etapa sem cumprir a anterior."],
-    ["Sem ele", "Eu seguia o ciclo quando dava tempo.\nSob prazo, era a primeira coisa que eu abandonava."],
+    ["Com framework", "O ciclo é imposto: entender → planejar → executar → verificar.\nO agente não avança de etapa sem cumprir a anterior."],
+    ["Sem framework", "O ciclo é seguido quando dá tempo.\nSob prazo, é a primeira coisa a ser abandonada."],
   ];
   let y = 2.4;
   itens.forEach((it, i) => {
@@ -491,27 +492,27 @@ secao("C", "O que eu persisto", "Contexto morre com a sessão. O que precisa sob
     });
     y += 1.5;
   });
-  s.addText("A disciplina que depende de mim lembrar, sob prazo, não é disciplina.", {
+  s.addText("Disciplina que depende de alguém lembrar, sob prazo, não é disciplina.", {
     x: M, y: 5.5, w: 11.9, h: 0.5,
     fontFace: FT, fontSize: 19, bold: true, color: C.light, margin: 0,
   });
   selo(s, true);
-  s.addNotes("Ponto honesto: o processo custa tokens a mais por sessao. O ganho aparece em nao refazer a tarefa.");
+  s.addNotes("Aqui vale dizer qual voce usa (Superpowers) — como exemplo, nao como recomendacao fechada. Ponto honesto: o processo custa tokens a mais por sessao; o ganho aparece em nao refazer a tarefa.");
 }
 
 // ============ 16. SECAO D ============
-secao("D", "Quando eu delego", "Vocês usam agente autônomo. Aqui está o critério que eu aplicaria");
+secao("D", "Quando delegar", "O critério vale para qualquer agente autônomo — Devin ou outro");
 
 // ============ 17. MATRIZ ============
 {
   const s = novo();
-  titulo(s, "Faço na mão · piloto · delego");
-  subtitulo(s, "Decido isso antes de abrir a ferramenta, não depois", 1.42);
+  titulo(s, "Na mão · piloto · delega");
+  subtitulo(s, "Decisão que vem antes de abrir a ferramenta, não depois", 1.42);
 
   const cols = [
-    ["FAÇO NA MÃO", C.red, C.redLt, "Decisão de arquitetura\nTrade-off de produto\nCódigo de auth e pagamento\nIncidente em produção"],
+    ["NA MÃO", C.red, C.redLt, "Decisão de arquitetura\nTrade-off de produto\nCódigo de auth e pagamento\nIncidente em produção"],
     ["PILOTO", "B45309", "FDF1E3", "Causa desconhecida\nDesign ainda aberto\nRefactor que atravessa módulos\nExploração de alternativas"],
-    ["DELEGO", C.green, C.greenLt, "Migração mecânica\nBug com repro determinístico\nTeste faltando\nLint e tipo em massa"],
+    ["DELEGA", C.green, C.greenLt, "Migração mecânica\nBug com repro determinístico\nTeste faltando\nLint e tipo em massa"],
   ];
   const bw = 3.85, gap = 0.35;
   let x = M;
@@ -527,11 +528,11 @@ secao("D", "Quando eu delego", "Vocês usam agente autônomo. Aqui está o crit�
     });
     x += bw + gap;
   });
-  s.addText("Delego o tedioso e verificável. Piloto o ambíguo. Faço na mão o irreversível.", {
+  s.addText("Delegue o tedioso e verificável. Pilote o ambíguo. Faça na mão o irreversível.", {
     x: M, y: 5.05, w: W - 2 * M, h: 0.45,
     fontFace: FB, fontSize: 16, bold: true, color: C.text, margin: 0,
   });
-  s.addText("A pergunta que resolve quase tudo: existe teste que prova que ficou certo? Se não existe, não delego.", {
+  s.addText("A pergunta que resolve quase tudo: existe teste que prova que ficou certo? Se não existe, não delegue.", {
     x: M, y: 5.5, w: 11.9, h: 0.45,
     fontFace: FB, fontSize: 14, color: C.muted, margin: 0, italic: true,
   });
@@ -573,7 +574,7 @@ secao("D", "Quando eu delego", "Vocês usam agente autônomo. Aqui está o crit�
     x: M, y: 4.9, w: W - 2 * M, h: 0.45,
     fontFace: FB, fontSize: 16, bold: true, color: C.text, margin: 0,
   });
-  s.addText("Meu atalho: git diff nos testes primeiro. Linha alterada em teste existente exige justificativa escrita.", {
+  s.addText("Atalho: git diff nos testes primeiro. Linha alterada em teste existente exige justificativa escrita.", {
     x: M, y: 5.35, w: 11.9, h: 0.45,
     fontFace: FB, fontSize: 14, color: C.muted, margin: 0, italic: true,
   });
@@ -584,14 +585,14 @@ secao("D", "Quando eu delego", "Vocês usam agente autônomo. Aqui está o crit�
 // ============ 19. O QUE EU NAO FACO ============
 {
   const s = novo();
-  titulo(s, "O que eu não faço com IA");
+  titulo(s, "Onde não usar IA");
   subtitulo(s, "Saber onde não usar é metade do ganho", 1.42);
 
   const itens = [
-    ["Conta e agregação", "Ele estima a partir do texto. Peço a query — a máquina calcula, o número é auditável."],
-    ["Decisão de arquitetura", "Uso para levantar alternativas. A escolha é minha, e é onde está o meu valor."],
-    ["Aprovar o que não entendo", "Se não entendo cada linha, não aprovo. Dívida no dia 1, incidente no dia 90."],
-    ["Dado de cliente e segredo", "Nunca cola no prompt. Anonimizo ou uso dado sintético. Sem exceção de prazo."],
+    ["Conta e agregação", "O modelo estima a partir do texto. Peça a query — a máquina calcula, o número é auditável."],
+    ["Decisão de arquitetura", "Serve para levantar alternativas. A escolha é da pessoa — e é onde está o valor dela."],
+    ["Aprovar o que não se entende", "Se não entende cada linha, não aprove. Dívida no dia 1, incidente no dia 90."],
+    ["Dado de cliente e segredo", "Nunca no prompt. Anonimize ou use dado sintético. Sem exceção de prazo."],
   ];
   let y = 2.05;
   itens.forEach((it) => {
@@ -618,12 +619,12 @@ secao("D", "Quando eu delego", "Vocês usam agente autônomo. Aqui está o crit�
 // ============ 20. FERRAMENTAS ============
 {
   const s = novo();
-  titulo(s, "Minha stack, rápido");
-  subtitulo(s, "Menos importante do que tudo que veio antes — mas sempre perguntam", 1.42);
+  titulo(s, "Ferramentas, rápido");
+  subtitulo(s, "O que eu uso hoje. Menos importante que tudo que veio antes — mas sempre perguntam", 1.42);
 
   const linhas = [
-    ["Claude Code", "onde eu trabalho", C.teal],
-    ["Superpowers", "impõe o ciclo; a que mais mudou meu resultado", C.teal],
+    ["Claude Code", "onde o trabalho acontece", C.teal],
+    ["Superpowers", "framework de processo: impõe o ciclo dentro da ferramenta", C.teal],
     ["Obsidian", "o que o código não conta: decisão, porquê, regra de negócio", C.teal],
     ["Compressão de saída", "resposta densa; economiza agora e no histórico depois", C.muted],
   ];
@@ -651,7 +652,7 @@ secao("D", "Quando eu delego", "Vocês usam agente autônomo. Aqui está o crit�
 // ============ 21. SEGUNDA-FEIRA ============
 {
   const s = novo();
-  titulo(s, "Se vocês pegarem três coisas daqui");
+  titulo(s, "Três coisas para segunda-feira");
   subtitulo(s, "Nessa ordem — a primeira sozinha já muda o resultado", 1.42);
 
   const itens = [
@@ -697,7 +698,7 @@ secao("D", "Quando eu delego", "Vocês usam agente autônomo. Aqui está o crit�
   s.addText(
     [
       { text: "Onde isso não vai funcionar no nosso contexto?", options: { bullet: true, breakLine: true, paraSpaceAfter: 8 } },
-      { text: "O que vocês já fazem que eu deveria copiar?", options: { bullet: true, breakLine: true, paraSpaceAfter: 8 } },
+      { text: "O que vocês já fazem que o resto do time deveria copiar?", options: { bullet: true, breakLine: true, paraSpaceAfter: 8 } },
       { text: "Qual tarefa da sprint serviria de teste?", options: { bullet: true } },
     ],
     { x: M, y: 4.25, w: 8.5, h: 1.6, fontFace: FB, fontSize: 15, color: "9AA4B2", margin: 0, lineSpacing: 22 }
