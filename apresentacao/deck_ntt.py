@@ -466,19 +466,30 @@ for num, t1, t2 in itens:
 rodape(s, "Nenhuma das três depende de instalar nada.")
 notas(s, "Fechar pedindo que escolham UMA e tentem essa semana.")
 
-# 22 ENCERRAMENTO  (layout oficial de fechamento do template)
+# 22 Q&A  (slide de conteudo: nao pode dividir espaco com o logo do fechamento)
+s = novo(L_TITULO, "Agora é de vocês")
+txt(s, "30 minutos. Discordar é o melhor uso desse tempo.", M, 1.45, 11, 0.5,
+    size=16, bold=True, cor=AZUL_E)
+itens_qa = [("Onde isso não vai funcionar no nosso contexto?", ""),
+            ("O que vocês já fazem que o resto do time deveria copiar?", ""),
+            ("Qual tarefa da sprint serviria de teste?", "a mais concreta — começa por essa se travar")]
+y = 2.3
+for pergunta, nota in itens_qa:
+    card(s, M, y, W - 2 * M, 0.95, SUAVE)
+    txt(s, pergunta, M + 0.32, y + (0.3 if not nota else 0.16), 10.8, 0.4, size=15, bold=True)
+    if nota:
+        txt(s, nota, M + 0.32, y + 0.56, 10.8, 0.3, size=12, cor=MUTED, italic=True)
+    y += 1.12
+txt(s, "Material completo e templates: <link do repositório>", M, 5.95, 10, 0.4,
+    size=12, cor=MUTED, italic=True)
+notas(s, "Se travar, comecar pela terceira pergunta: e a mais concreta e sempre destrava.")
+
+# 23 ENCERRAMENTO NTT  (layout oficial, sem nada por cima do logo)
 s = prs.slides.add_slide(L_FIM)
 for ph in list(s.placeholders):
     if str(ph.placeholder_format.type).startswith(("TITLE", "BODY", "OBJECT", "SUBTITLE")):
         ph._element.getparent().remove(ph._element)
-txt(s, "Agora é de vocês", M, 2.3, 11, 0.9, size=38, font=FT, bold=True, cor=BRANCO)
-txt(s, "30 minutos. Discordar é o melhor uso desse tempo.", M, 3.25, 11, 0.5,
-    size=16, cor="D6E9F7")
-txt(s, "•  Onde isso não vai funcionar no nosso contexto?\n\n•  O que vocês já fazem que o resto do time deveria copiar?\n\n•  Qual tarefa da sprint serviria de teste?",
-    M, 4.1, 9.5, 1.5, size=14, cor=BRANCO, space=1.3)
-txt(s, "Material completo e templates: <link do repositório>", M, 5.85, 10, 0.4,
-    size=11.5, cor="D6E9F7", italic=True)
-notas(s, "Se travar, comecar pela terceira pergunta: e a mais concreta e sempre destrava.")
+notas(s, "Slide de encerramento da marca. Nada e sobreposto ao logo.")
 
 prs.save(SAIDA)
 print("ok: %s  (%d slides, estilo=%s)" % (SAIDA, len(prs.slides._sldIdLst), ESTILO))
