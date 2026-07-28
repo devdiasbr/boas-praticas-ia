@@ -80,6 +80,12 @@ nenhuma ferramenta de compressão. O time trabalha como sempre trabalhou.
 É a etapa que todos querem pular e sem a qual o resto não significa nada. Não existe
 "medir depois e comparar com a lembrança de como era".
 
+> **Atalho possível:** os assistentes já gravam as sessões em disco. Se o time usa IA
+> há alguns meses, o baseline **já existe** — rode `npx codeburn overview` e
+> `npx codeburn optimize` e você tem o retrato retroativo sem esperar duas semanas.
+> Nesse caso, congele o baseline com `export` e comece direto pela Semana 3.
+> Como ler a saída: §12 do [material](../README.md).
+
 - [ ] Instrumentação instalada na máquina de cada pessoa da squad
 - [ ] Primeira coleta ao fim da Semana 1 (valida que o dado está chegando)
 - [ ] Coleta consolidada ao fim da Semana 2

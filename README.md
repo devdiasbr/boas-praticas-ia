@@ -1269,6 +1269,59 @@ Todas medem movimento. Nenhuma mede valor — e todas pioram quando viram meta.
 
 **Sem instrumentação, tudo acima é achismo.** Existe uma categoria de ferramenta que lê os arquivos de sessão que os assistentes já gravam em disco e devolve custo por modelo, projeto e tarefa (ver Apêndice C.2). Vale instalar antes de discutir se a IA está ou não valendo a pena — a conversa muda quando alguém traz o número em vez da impressão.
 
+### Como instrumentar na prática
+
+Os assistentes já gravam cada sessão em disco. **Você provavelmente já tem meses de
+baseline sem saber** — não é preciso esperar para começar a medir.
+
+Com a categoria de observabilidade do Apêndice C.2, três comandos resolvem:
+
+```bash
+npx codeburn overview
+```
+
+Custo, tokens e chamadas do mês, em texto puro. É o retrato inicial.
+
+```bash
+npx codeburn optimize
+```
+
+Diagnóstico com desperdício estimado e correção sugerida por item. É o mais útil dos três.
+
+```bash
+npx codeburn export --format json
+```
+
+Congela o baseline antes de mudar qualquer coisa. **Guarde fora do repositório**: são
+dados financeiros e nomes de projeto de cliente.
+
+#### Como ler o resultado
+
+| Olhe para | Porque decide a sua próxima ação |
+|---|---|
+| **Input, output e cache separados** | Somados, escondem tudo. É a separação que diz qual prática vale a pena |
+| **Taxa de acerto na primeira tentativa** | Detector de regressão. Se cair depois de uma mudança, a economia está custando qualidade |
+| **Sessões com muitos retries** | Onde o retrabalho aparece em dinheiro. Costuma ser a maior fatia |
+| **Razão leitura/edição** | Abaixo de ~4:1, o agente edita sem ler antes — e retenta |
+| **Ferramentas conectadas e nunca chamadas** | Custo fixo por turno, ganho zero. A correção é uma linha de config |
+
+#### Três armadilhas de interpretação
+
+**Cache alto muda a conclusão.** Com taxa de acerto de cache acima de ~95%, o input é
+reprocessado por uma fração do preço — e camadas de compressão de contexto passam a ter
+ganho marginal. Sem olhar essa métrica, você instala a ferramenta errada.
+
+**"Economia potencial" é estimativa de quem vende a análise.** Trate como hipótese a
+verificar (§9), não como dinheiro no bolso. O número real só aparece medindo antes e
+depois.
+
+**Sessão cara não é prova de desperdício.** Uma sessão de alto custo pode ter entregue
+uma feature inteira. O sinal útil é a combinação: custo alto **+** muitos retries **+**
+nenhuma entrega no fim.
+
+> **Ordem que evita a armadilha mais comum:** meça primeiro, escolha a ferramenta depois.
+> Quem instala antes de medir acaba otimizando o que já estava barato.
+
 **Cuidado com o deslocamento do gargalo.** O padrão mais comum: implementação cai 40%, review sobe 60%, lead time fica igual e a equipe sente que está mais lenta com IA. O gargalo mudou de lugar — ele não sumiu. Meça o fluxo ponta a ponta, nunca só a etapa que a IA acelera.
 
 ## 13. Adoção sem dependência
