@@ -1861,6 +1861,10 @@ Você roda. O número vem do banco, é reproduzível, é auditável, e nenhum da
 *Escrito para ser conduzido ao vivo. O erro do agente aqui é **previsível**, o que
 permite demonstrá-lo sem ensaio.*
 
+> **Este caso existe como exercício executável em [`hands-on/`](hands-on/)** — chamado,
+> dados, testes e gabarito prontos, rodando com `pytest` e sem infraestrutura. O texto
+> abaixo explica o porquê; a pasta é para a squad fazer.
+
 **O pedido, como chega:**
 
 > *"O faturamento de junho no dashboard está maior que o do fechamento contábil."*
