@@ -9,12 +9,47 @@ Material agnóstico de ferramenta. Vale para Claude, GPT, Gemini, Devin e o que 
 | Qualquer pessoa | Camada 0 |
 | Dev / engenheiro | Camada 0 + 1, Apêndice A (casos) |
 | Liderança / decisor | Camada 0 + 2, matriz da §8.1, Caso A.2 |
-| Precisa cortar custo | §11.5 (catálogo de técnicas, ordenado por impacto) |
+| Precisa cortar custo | §15 (catálogo de técnicas, ordenado por impacto) |
 | Com pressa | Apêndice C (cheatsheet) |
 
-Cada seção segue o mesmo padrão: **Princípio → Por quê → Faça → Não faça → Exemplo concreto**.
+As seções da **Camada 1** seguem o mesmo padrão: *Princípio → Por quê → Faça → Não faça → Exemplo concreto*. A Camada 0 é conceitual e a Camada 2 é organizada por tema de decisão.
 
-Exemplos de código estão em Python por ser a stack mais comum entre as squads. O princípio vale igual em qualquer linguagem — o **Apêndice A** traz quatro casos narrados do pedido até o PR revisado.
+Exemplos de código estão em Python por ser a stack mais comum entre as squads. O princípio vale igual em qualquer linguagem.
+
+---
+
+## Sumário
+
+**Camada 0 — Fundamentos**
+0.1 Função sem memória · 0.2 Contexto ≠ memória ≠ conhecimento · 0.3 Token · 0.4 Não-determinismo
+
+**Camada 1 — Prática do engenheiro**
+
+| § | Seção | Sobre |
+|---|---|---|
+| 1 | Economia de contexto | Orçamento de janela, o que colar e o que não |
+| 2 | Otimização de prompts | Estrutura, critério de aceite, verbosidade |
+| 3 | SDD — Spec-Driven Development | Spec como fonte de verdade |
+| 4 | Skills e instrução reutilizável | O que sai da conversa e vira arquivo |
+| 5 | Memória e conhecimento compartilhado | Notas, vault, o que sobrevive à sessão |
+| 6 | MCP e ferramentas | Quando ferramenta vence conhecimento |
+| 7 | Harness e modos de operação | Assistido × delegado |
+| 8 | Delegação a agente autônomo | Matriz, template de tarefa, orçamento, review |
+| 9 | Verificação de output | Evidência antes de afirmação |
+| 10 | Antipadrões | Índice de erros comuns e para onde ir |
+
+**Camada 2 — Governança e decisão**
+
+| § | Seção | Sobre |
+|---|---|---|
+| 11 | Modelo de custo | Duas unidades de cobrança, escolha de modelo |
+| 12 | Segurança e dados | Prompt injection, o que nunca entra no prompt |
+| 13 | Métricas | Medir ganho, não movimento |
+| 14 | Adoção sem dependência | Como o time sobe de nível sem se viciar |
+| 15 | Catálogo de redução de custo | 21 técnicas ordenadas por impacto |
+
+**Apêndices**
+A — Casos ponta a ponta · B — Ferramentas (equivalência, categorias, stack e medição) · C — Cheatsheet · D — Glossário · E — Referências
 
 ---
 
@@ -235,12 +270,7 @@ ACEITE
 - Explique em 2 linhas quantas queries antes e depois
 ```
 
-```python
-def buscar_pedidos(cliente_ids):
-    ...
-```
-
-O prompt errado devolve código; o certo devolve código **que entra no PR**.
+O prompt errado devolve código. O certo devolve código **que entra no PR** — porque as restrições que tornariam a resposta inutilizável (mudou a assinatura, virou async, trouxe dependência) foram declaradas antes, não descobertas no review.
 
 ### Exemplo — plano antes do código
 
@@ -289,7 +319,7 @@ No nível persistente existem plugins que forçam um estilo telegráfico — cor
 - Comprimir **código, commit, mensagem de erro ou instrução de segurança**. Aí a redundância é proteção. Um passo a passo de deploy escrito em fragmentos é um incidente esperando acontecer — e mensagem de erro alterada deixa de ser rastreável.
 - Aplicar em qualquer coisa que sai da sua tela: documentação, comunicação com cliente, material de onboarding, explicação para quem está aprendendo. Ali a redundância é o que faz a comunicação funcionar.
 - Comprimir sequência multi-passo onde a ordem importa. Fragmento ambíguo custa mais em erro do que economizou em token.
-- **Aceitar o percentual de economia que o plugin anuncia.** É um claim como qualquer outro (§9). Meça com instrumentação real (§11.3), na sua sessão, no seu uso.
+- **Aceitar o percentual de economia que o plugin anuncia.** É um claim como qualquer outro (§9). Meça com instrumentação real (§13), na sua sessão, no seu uso.
 
 **A ressalva de proporção:** estilo de saída é a alavanca *menor*. O contexto inchado (§1) e o retrabalho por spec ruim (§8) movem muito mais dinheiro. Comprimir a resposta enquanto se cola log de 40 mil tokens é otimizar o centavo e ignorar a nota. Faça as duas — nessa ordem de prioridade.
 
@@ -543,7 +573,7 @@ Um vault de notas conectado à IA (via MCP ou integração equivalente) transfor
 
 - **Memória-diário.** "Hoje o Bruno perguntou sobre o importador e resolvemos com retry" não é fato, é log. Guarde a conclusão: *"integração com 3P usa retry por causa do SLA de 97%"*. O que interessa é o que ficou verdadeiro, não o que aconteceu.
 - **Duplicar o que o repositório já diz.** Estrutura de código, histórico do Git, assinatura de função. Isso é lido do código, sempre atualizado, de graça. Memória duplicada só serve para divergir.
-- **Guardar segredo, credencial ou dado pessoal no vault.** Ele é lido inteiro por ferramenta, todo dia, e frequentemente sincronizado para nuvem pessoal. Ver §11.2.
+- **Guardar segredo, credencial ou dado pessoal no vault.** Ele é lido inteiro por ferramenta, todo dia, e frequentemente sincronizado para nuvem pessoal. Ver §12.
 - **Acumular sem podar.** Vault de 4 mil notas sem curadoria é ruído caro: piora a recuperação e enche o contexto.
 - **Confiar em memória sobre estado mutável.** Versão de dependência, nome do dono do serviço, caminho de arquivo, URL de ambiente. Isso se consulta, não se memoriza.
 
@@ -612,7 +642,7 @@ MCP (Model Context Protocol) é um padrão aberto para conectar modelo a fonte d
 - **Prefira ferramenta a colar dado.** Se o modelo pode consultar o ticket, não cole o ticket.
 - **Descrição de ferramenta é prompt.** Nome ambíguo e descrição preguiçosa causam chamada errada. Deixe explícito quando usar e quando não usar.
 - **Ferramenta que escreve exige confirmação.** Leitura pode ser livre. Escrita, envio, deleção e pagamento passam por aprovação humana explícita.
-- **Trate retorno de ferramenta como dado não confiável.** Ver §11.2 — isso é a principal superfície de prompt injection.
+- **Trate retorno de ferramenta como dado não confiável.** Ver §12 — isso é a principal superfície de prompt injection.
 
 **Não faça:**
 
@@ -1045,9 +1075,9 @@ A terceira é a mais produtiva do dia a dia — costuma revelar a fragilidade qu
 | **Ferramentaria** | Vinte conectores ligados. Contexto inchado, escolha degradada. | Conecte por tarefa. |
 | **Prompt-perfeccionismo** | 30 minutos escrevendo o prompt definitivo. | Prompt razoável + duas iterações. |
 | **IA onde não cabe** | LLM para o que uma consulta SQL, um regex ou uma planilha resolvem melhor e de forma determinística. | Use o LLM para *escrever* a solução determinística. |
-| **Modelo grande sempre** | Usa o topo de linha para classificar e formatar. | Ver §11.1. |
+| **Modelo grande sempre** | Usa o topo de linha para classificar e formatar. | Ver §11. |
 | **Dependência cognitiva** | O time entrega mais e entende menos. Ninguém sabe explicar o próprio sistema. | Regra dura: ninguém aprova o que não entende. Rotacione revisão. Rode sessão de leitura de código. |
-| **Teatro de produtividade** | Métrica sobe (linhas, PRs, tarefas), valor entregue não. | Ver §11.3. |
+| **Teatro de produtividade** | Métrica sobe (linhas, PRs, tarefas), valor entregue não. | Ver §13. |
 | **Memória-diário** | Vault vira log de reunião. Cresce, custa, não informa. | Guarde o fato e o porquê, não o acontecido (§5). |
 | **Compressão fora de lugar** | Estilo telegráfico aplicado a passo a passo, doc de cliente ou instrução de segurança. Economiza token, gera erro. | Comprima onde o leitor é você. Código, comando e segurança em texto normal (§2). |
 | **Otimizar o centavo** | Comprime a resposta e cola log de 40 mil tokens no mesmo turno. | Ordem certa: contexto (§1) → retrabalho (§8) → estilo de saída (§2). |
@@ -1057,7 +1087,7 @@ A terceira é a mais produtiva do dia a dia — costuma revelar a fragilidade qu
 
 # Camada 2 — Governança e decisão
 
-## 11.1 Custo — duas unidades diferentes
+## 11. Modelo de custo — duas unidades diferentes
 
 Existem **duas economias**, com alavancas distintas. Confundir as duas é a origem da maior parte da otimização inútil.
 
@@ -1082,12 +1112,9 @@ Rodar tudo no maior modelo é o desperdício mais comum e mais fácil de corrigi
 
 ### Onde o dinheiro vaza
 
-1. **Retrabalho** — de longe o maior item. Tarefa mal especificada, refeita duas ou três vezes.
-2. **Contexto inchado** — reenviado a cada turno de cada sessão de cada pessoa, todo dia.
-3. **Cache invalidado** — prefixo instável no começo do contexto joga fora a economia mais barata que existe.
-4. **Modelo superdimensionado** para tarefa trivial.
-5. **Ferramentas sempre ligadas** — custo fixo por turno.
-6. **Output verboso por padrão** — o token mais caro, pedido sem necessidade.
+Em ordem de tamanho: **retrabalho** por tarefa mal especificada · **contexto inchado** reenviado a cada turno de cada pessoa · **cache invalidado** por prefixo instável · **modelo superdimensionado** para tarefa trivial.
+
+> O catálogo completo de contramedidas, com esforço e impacto de cada uma, está na **§15**. Esta seção estabelece o *modelo* de custo; a §15 é o *plano de ação*.
 
 ### Exemplo — ordem do contexto e cache
 
@@ -1115,7 +1142,7 @@ O mesmo conteúdo, duas montagens. A diferença está só na ordem:
 
 Multiplique por 30 turnos, por 15 pessoas, por 20 dias úteis. É a otimização de maior retorno e menor esforço que existe — e a mais ignorada, porque não é visível em nenhuma tela.
 
-## 11.2 Segurança e dados
+## 12. Segurança e dados
 
 ### A fronteira instrução × dado
 
@@ -1201,7 +1228,7 @@ O problema de performance é idêntico. O dado pessoal não precisava estar lá 
 - Regra sobre memória compartilhada: o que pode ser gravado, quem revisa, onde o vault é sincronizado. Vault pessoal em nuvem pessoal não é lugar de dado da empresa.
 - Rastreabilidade: dá para saber que um artefato foi gerado por IA e quem aprovou.
 
-## 11.3 Métricas — medir ganho, não movimento
+## 13. Métricas — medir ganho, não movimento
 
 **Métricas que enganam:** linhas de código geradas · número de prompts · PRs abertos · percentual de código escrito por IA · tempo economizado autodeclarado.
 
@@ -1222,7 +1249,7 @@ Todas medem movimento. Nenhuma mede valor — e todas pioram quando viram meta.
 
 **Cuidado com o deslocamento do gargalo.** O padrão mais comum: implementação cai 40%, review sobe 60%, lead time fica igual e a equipe sente que está mais lenta com IA. O gargalo mudou de lugar — ele não sumiu. Meça o fluxo ponta a ponta, nunca só a etapa que a IA acelera.
 
-## 11.4 Adoção sem dependência
+## 14. Adoção sem dependência
 
 **O risco real não é a IA errar. É o time perder a capacidade de perceber que ela errou.**
 
@@ -1236,7 +1263,7 @@ Todas medem movimento. Nenhuma mede valor — e todas pioram quando viram meta.
 
 ---
 
-## 11.5 Catálogo de técnicas de redução de custo
+## 15. Catálogo de técnicas de redução de custo
 
 Consolidação do que está espalhado pelo documento, mais o que só se aplica a uso programático. **Ordenado por impacto, não por facilidade.**
 
@@ -1248,7 +1275,7 @@ A regra que organiza tudo: *a maior economia não está em gastar menos por cham
 |---|---|---|---|---|
 | 1 | **Eliminar retrabalho com spec** | Sessões inteiras refeitas | Médio | §3, §8 |
 | 2 | **Contexto enxuto** — trecho, não arquivo | Input, em todo turno | Baixo | §1 |
-| 3 | **Modelo certo por tarefa** | Ordem de grandeza no preço unitário | Baixo | §11.1 |
+| 3 | **Modelo certo por tarefa** | Ordem de grandeza no preço unitário | Baixo | §11 |
 | 4 | **Não usar LLM onde não cabe** | A chamada inteira | Baixo | §10, Caso A.4 |
 | 5 | **Sessão nova quando o assunto muda** | Acúmulo composto de histórico | Nenhum | §1 |
 
@@ -1262,7 +1289,7 @@ E ela é instrumentável: existe uma categoria de framework que impõe o ciclo s
 
 | # | Técnica | Reduz | Como |
 |---|---|---|---|
-| 6 | **Cache de prompt** | Input repetido, drasticamente | Estável primeiro, volátil por último. Nunca mude o começo do contexto (§11.1) |
+| 6 | **Cache de prompt** | Input repetido, drasticamente | Estável primeiro, volátil por último. Nunca mude o começo do contexto (§11) |
 | 7 | **Resumir e reiniciar** | Histórico acumulado | ~90k tokens de conversa → ~600 de estado (§1) |
 | 8 | **Subagente como compressor** | Exploração cara no contexto principal | Busca ampla em sessão isolada; só o resultado volta (§1) |
 | 9 | **Output curto por padrão** | O token mais caro, e o histórico futuro | Política de verbosidade (§2) |
@@ -1298,7 +1325,7 @@ Só se aplica a quem constrói sobre a API. Aqui estão os ganhos que nenhum aju
 
 ### Por onde começar
 
-Se você vai fazer **uma** coisa esta semana: **instrumente** (§11.3). Sem número, otimização é palpite — e o palpite mais comum é atacar o item #9 da lista, que é o menor, e ignorar o #1, que é o maior.
+Se você vai fazer **uma** coisa esta semana: **instrumente** (§13). Sem número, otimização é palpite — e o palpite mais comum é atacar o item #9 da lista, que é o menor, e ignorar o #1, que é o maior.
 
 Depois, na ordem: contexto enxuto → modelo certo → cache → spec. As quatro juntas costumam responder pela maior parte do que dá para economizar sem mudar nada estrutural.
 
@@ -1306,7 +1333,9 @@ Depois, na ordem: contexto enxuto → modelo certo → cache → spec. As quatro
 
 # Apêndice A — Casos ponta a ponta
 
-Quatro casos reais em formato narrado: do pedido até o desfecho. Dois dão certo, dois dão errado — os que dão errado ensinam mais.
+Quatro casos em formato narrado: do pedido até o desfecho. Dois dão certo, dois dão errado — os que dão errado ensinam mais.
+
+> **Estes casos são ilustrativos**, construídos para demonstrar o padrão de decisão — não são registros de projetos executados. Substitua-os por casos reais das squads assim que houver material: exemplo de casa convence mais e envelhece melhor.
 
 ---
 
@@ -1514,9 +1543,9 @@ Além do assistente em si, existe uma camada de ferramentas de terceiro que atac
 | Categoria | Problema que resolve | Seção | Exemplo atual |
 |---|---|---|---|
 | **Framework de processo** | O agente pula direto para o código: sem spec, sem plano, sem verificação. É a origem do retrabalho, que é o maior custo de todos | §3, §8, §9 | `obra/superpowers` — impõe um ciclo (brainstorming → plano → TDD → review → verificação) e obriga o agente a checar se existe skill aplicável **antes** de agir |
-| **Compressão de contexto** | Saída de ferramenta, log e chunk de RAG entram inteiros no contexto e custam caro | §1, §11.1 | `headroomlabs-ai/headroom` — atua como lib, proxy ou MCP entre o agente e o modelo |
+| **Compressão de contexto** | Saída de ferramenta, log e chunk de RAG entram inteiros no contexto e custam caro | §1, §11 | `headroomlabs-ai/headroom` — atua como lib, proxy ou MCP entre o agente e o modelo |
 | **Indexação estruturada do repositório** | O agente varre arquivo por arquivo para entender o projeto, gastando contexto em exploração | §5, §6 | `Graphify-Labs/graphify` — grafo consultável do código + docs + schema, via AST local |
-| **Observabilidade de custo** | Ninguém sabe para onde foi o token nem qual tarefa custou o quê | §11.1, §11.3 | `getagentseal/codeburn` — lê os arquivos de sessão locais e abre dashboard por modelo, projeto e tarefa |
+| **Observabilidade de custo** | Ninguém sabe para onde foi o token nem qual tarefa custou o quê | §11, §13 | `getagentseal/codeburn` — lê os arquivos de sessão locais e abre dashboard por modelo, projeto e tarefa |
 | **Ruleset de restrição** | O agente escreve mais código do que o necessário, e código a mais é dívida a mais | §2, §4 | `DietrichGebert/ponytail` — injeta uma disciplina YAGNI no contexto antes da geração |
 | **Compressão do estilo de saída** | Resposta verbosa custa o token caro agora e volta como input em todo turno seguinte | §0.3, §2 | Plugins de estilo telegráfico (ex.: *caveman mode*), com níveis de intensidade e exceção para código e segurança |
 
@@ -1526,7 +1555,7 @@ Além do assistente em si, existe uma camada de ferramentas de terceiro que atac
 2. **Ela é observável?** Você consegue medir o efeito, ou depende da métrica que o próprio site da ferramenta publica?
 3. **O que ela vê?** Compressor e indexador leem **todo** o seu código e contexto. Trate como fornecedor com acesso ao repositório, não como utilitário.
 4. **Roda local ou manda para fora?** Essa é a diferença entre uma dependência e um incidente de vazamento.
-5. **Piloto antes de padronizar.** Uma squad, um mês, métrica antes e depois (§11.3). Não role para a organização inteira porque ficou bonito na demo.
+5. **Piloto antes de padronizar.** Uma squad, um mês, métrica antes e depois (§13). Não role para a organização inteira porque ficou bonito na demo.
 
 > ### ⚠️ Cuidado com clones e pacotes homônimos
 >
@@ -1587,9 +1616,9 @@ MEDIR         → observabilidade de custo (não economiza nada; instrumenta tud
 
 - **Indexador e compressor competem pelo mesmo token.** O grafo já elimina a exploração que o compressor comprimiria. Somar os dois percentuais superestima o resultado.
 - **Ruleset e verbosidade** cortam output em domínios diferentes (código × prosa) — somam melhor, mas nenhum toca o input, que costuma ser o volume maior.
-- **O compressor entra no caminho crítico.** Comprimir demais degrada a resposta e gera retrabalho — que é a alavanca nº 1 da §11.5, maior que tudo que ele economiza.
+- **O compressor entra no caminho crítico.** Comprimir demais degrada a resposta e gera retrabalho — que é a alavanca nº 1 da §15, maior que tudo que ele economiza.
 
-> **E o principal:** nenhuma camada de *compressão* resolve **retrabalho por spec ruim**, **custo de agente autônomo** (ACU não é token) ou **escolha errada de modelo**. Essas são as três maiores alavancas da §11.5 — e todas as três são método.
+> **E o principal:** nenhuma camada de *compressão* resolve **retrabalho por spec ruim**, **custo de agente autônomo** (ACU não é token) ou **escolha errada de modelo**. Essas são as três maiores alavancas da §15 — e todas as três são método.
 >
 > É exatamente por isso que o **framework de processo** ocupa um lugar diferente na stack: ele é a tentativa de empacotar método como ferramenta. Método continua sendo método; o que o framework faz é tirá-lo da disciplina individual (que varia por pessoa, por dia e por pressão de prazo) e colocá-lo no harness (§7), onde é aplicado igual, sempre. Nenhuma das outras camadas faz isso.
 
@@ -1645,7 +1674,7 @@ Ele é a única camada que **adiciona** passos. Isso tem contrapartidas reais:
 - Instrumente antes de otimizar. Sem número, é palpite
 - Spec boa > contexto enxuto > modelo certo > cache > estilo de saída
 - A maior economia é a chamada que não precisou acontecer
-- Catálogo completo das 21 técnicas: §11.5
+- Catálogo completo das 21 técnicas: §15
 
 **Antes de perguntar**
 - Sessão nova se o assunto é novo
@@ -1744,7 +1773,7 @@ Estas são as fontes que **devem** ser consultadas em vez deste documento sempre
 | **MCP — especificação** | `modelcontextprotocol.io` · repositório em `github.com/modelcontextprotocol/modelcontextprotocol` |
 | **Preço, cache de prompt, processamento em lote, controle de raciocínio** | Documentação oficial do fornecedor que você usa (Anthropic, OpenAI, Google). Cada um tem página própria de *pricing* e de *prompt caching* / *batch* |
 | **Nomes de recurso por ferramenta** (§B.1) | Documentação do produto. A tabela de equivalência deste documento envelhece primeiro |
-| **Devin / agentes autônomos** | Documentação do fornecedor, especialmente a **unidade de cobrança** — é o que difere do modelo de token (§11.1) |
+| **Devin / agentes autônomos** | Documentação do fornecedor, especialmente a **unidade de cobrança** — é o que difere do modelo de token (§11) |
 
 ## E.3 Fundamentação conceitual
 
@@ -1754,7 +1783,7 @@ Referências que sustentam afirmações específicas do documento.
 |---|---|---|
 | Atenção degrada no **meio** de contextos longos; informação no início e no fim é melhor recuperada | §0.2, §1 | Liu, N. F. et al. *Lost in the Middle: How Language Models Use Long Contexts.* TACL, v. 12, p. 157–173, 2024. `arxiv.org/abs/2307.03172` |
 | Decisão técnica deve ser registrada com contexto e consequência, não só com o resultado | §3, §5 | Padrão **ADR** (Architecture Decision Record), proposto por Michael Nygard |
-| Métricas de fluxo (lead time, frequência de entrega, taxa de falha, tempo de recuperação) medem entrega melhor que métricas de atividade | §11.3 | Pesquisa **DORA** / *Accelerate*, de Forsgren, Humble e Kim |
+| Métricas de fluxo (lead time, frequência de entrega, taxa de falha, tempo de recuperação) medem entrega melhor que métricas de atividade | §13 | Pesquisa **DORA** / *Accelerate*, de Forsgren, Humble e Kim |
 | Nota atômica, com título que é a afirmação e ligação por link em vez de hierarquia | §5 | Método **Zettelkasten**, de Niklas Luhmann |
 | Não construir o que ainda não é necessário | §2, §B.2 | Princípio **YAGNI**, da tradição de Extreme Programming |
 
@@ -1770,4 +1799,18 @@ Referências que sustentam afirmações específicas do documento.
 
 ---
 
-*Documento vivo. Nomes de produto e preços mudam rápido; os princípios das Camadas 0 e 1 mudam devagar. Ao revisar, atualize o **Apêndice B** primeiro — é o que envelhece antes, e a §B.2 envelhece mais rápido que tudo (ferramentas verificadas em 2026-07-28; reconfirme na fonte primária antes de recomendar qualquer uma). Os casos do Apêndice A devem ser substituídos por casos reais das próprias squads assim que houver material: exemplo de casa vale mais que exemplo de manual.*
+## Manutenção deste documento
+
+Envelhece em velocidades diferentes. Ao revisar, siga esta ordem:
+
+| Prioridade | O que | Por quê |
+|---|---|---|
+| 1 | **Apêndice B.2** (ferramentas nomeadas) | Envelhece mais rápido que tudo. Verificado em 2026-07-28 — reconfirme na fonte primária antes de recomendar qualquer uma |
+| 2 | **Apêndice B.1** (equivalência) | Nomes de produto mudam a cada poucos meses |
+| 3 | **§11 e §15** (custo) | Preço, unidade de cobrança e desconto de lote mudam sem aviso |
+| 4 | **Apêndice A** (casos) | Substitua por casos reais das squads assim que houver material — exemplo de casa convence mais |
+| 5 | **Camadas 0 e 1** | Princípio. Muda devagar |
+
+**Convenções:** referência interna usa `§N`. Toda afirmação com número ou nome de produto precisa de fonte no Apêndice E, com data de verificação. Ao adicionar seção nova, atualize o Sumário e verifique as referências cruzadas.
+
+*Versão inicial: 2026-07-28.*
