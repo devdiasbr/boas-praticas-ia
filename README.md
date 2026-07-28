@@ -712,6 +712,36 @@ def buscar_pedido(pedido_id: str) -> dict:
 
 **Regra:** ferramenta para o que é **seu** ou **de agora**. Conhecimento do modelo para o que é **geral** e **estável**.
 
+### Ferramenta sem versão fixada quebra sozinha
+
+Comandos como `uvx <pacote>` e `npx <pacote>` resolvem as dependências para a versão
+mais recente **a cada execução**. Um *major* novo em qualquer dependência derruba o
+servidor sem que você tenha mudado uma linha.
+
+```
+uvx mcp-obsidian
+  → AttributeError: 'Server' object has no attribute 'list_tools'
+```
+
+O pacote estava na última versão publicada; quem mudou foi o SDK do qual ele depende,
+que subiu de 1.x para 2.0 e removeu a API usada. Correção: fixe a faixa.
+
+```
+uvx --with "mcp<2" mcp-obsidian
+```
+
+**O modo de falha é o pior possível: silencioso.** O servidor continua listado na
+configuração, o schema das ferramentas continua sendo carregado no contexto em toda
+sessão — e nada é entregue. Você paga o custo fixo por turno de uma integração que não
+funciona, e só descobre quando alguém repara que o agente nunca usa aquela ferramenta.
+
+**Faça:**
+- Fixe a faixa de versão de todo MCP de terceiro, do pacote e das dependências críticas.
+- Revise a saúde dos servidores periodicamente. No Claude Code, `claude mcp list` mostra
+  quem está conectado e quem falhou.
+- Trate servidor quebrado como servidor removido: se não conecta, tire da configuração
+  até consertar — carregado e quebrado é o pior dos dois mundos.
+
 ---
 
 ## 7. Harness e modos de operação
@@ -1785,6 +1815,7 @@ Você roda. O número vem do banco, é reproduzível, é auditável, e nenhum da
 | **Delegação prematura** | Joga tarefa ambígua no agente autônomo e torce. | Matriz da §8.1. Ambíguo se pilota, não se delega. |
 | **Review de carimbo** | PR de agente aprovado sem rodar. | Checklist da §8.4. |
 | **Ferramentaria** | Vinte conectores ligados. Contexto inchado, escolha degradada. | Conecte por tarefa. |
+| **MCP zumbi** | Servidor quebrado continua configurado: carrega schema, não entrega nada. Falha silenciosa. | Fixe versão, revise a saúde, remova o que não conecta (§6). |
 | **Prompt-perfeccionismo** | 30 minutos escrevendo o prompt definitivo. | Prompt razoável + duas iterações. |
 | **IA onde não cabe** | LLM para o que uma consulta SQL, um regex ou uma planilha resolvem melhor e de forma determinística. | Use o LLM para *escrever* a solução determinística. |
 | **Modelo grande sempre** | Usa o topo de linha para classificar e formatar. | Ver §10. |
@@ -1900,6 +1931,7 @@ Além do assistente em si, existe uma camada de ferramentas de terceiro que atac
 - Não entendeu? Não aprova
 
 **Sempre**
+- MCP de terceiro: fixe a versão. Sem fixar, quebra sozinho e falha calado
 - Instrução vem de você. Todo o resto é dado
 - Segredo e dado pessoal não entram no prompt
 - Tarefa pequena bate tarefa épica
