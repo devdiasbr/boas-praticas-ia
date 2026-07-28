@@ -56,7 +56,7 @@ Exemplos de código estão em Python por ser a stack mais comum entre as squads.
 
 | | Apêndice | Sobre |
 |---|---|---|
-| A | Casos ponta a ponta | O fluxo completo (A.1) + quatro casos de decisão |
+| A | Casos ponta a ponta | Fluxo completo, quatro casos de decisão e um hands-on de dados |
 | B | Antipadrões | Índice reverso de erros comuns |
 | C | Ferramentas | Equivalência, categorias de apoio e roteiro de instalação |
 | D | Cheatsheet | Uma página, para consulta rápida |
@@ -1503,9 +1503,9 @@ Ele é a única camada que **adiciona** passos. Isso tem contrapartidas reais:
 
 # Apêndice A — Casos ponta a ponta
 
-Cinco casos em formato narrado, do pedido até o desfecho.
+Seis casos em formato narrado, do pedido até o desfecho.
 
-O **A.1** percorre o fluxo inteiro numa tarefa só, mostrando como as peças se conectam — é o que ler primeiro. Os quatro seguintes isolam uma decisão cada; dois dão certo, dois dão errado, e os que dão errado ensinam mais.
+O **A.1** percorre o fluxo inteiro numa tarefa só, mostrando como as peças se conectam — é o que ler primeiro. Os quatro seguintes isolam uma decisão cada; dois dão certo, dois dão errado, e os que dão errado ensinam mais. O **A.6** é de engenharia de dados e foi escrito para ser conduzido como hands-on.
 
 > **Estes casos são ilustrativos**, construídos para demonstrar o padrão de decisão — não são registros de projetos executados. Substitua-os por casos reais das squads assim que houver material: exemplo de casa convence mais e envelhece melhor.
 
@@ -1853,6 +1853,151 @@ Você roda. O número vem do banco, é reproduzível, é auditável, e nenhum da
 | Decidir o que fazer com o resultado | **A pessoa** |
 
 **A lição:** quando a resposta precisa ser exata e reproduzível, o LLM não é a ferramenta — ele é quem **constrói** a ferramenta. É a diferença entre pedir a conta e pedir a calculadora.
+
+---
+
+## A.6 · Engenharia de dados — o caso para hands-on
+
+*Escrito para ser conduzido ao vivo. O erro do agente aqui é **previsível**, o que
+permite demonstrá-lo sem ensaio.*
+
+**O pedido, como chega:**
+
+> *"O faturamento de junho no dashboard está maior que o do fechamento contábil."*
+
+Pode ser filtro errado, régua diferente, erro de agregação ou duplicata. Quem abre o
+editor agora escolhe uma dessas quatro no escuro.
+
+### ① Entender
+
+A ingestão do sistema de origem reprocessou um lote e algumas linhas entraram duas
+vezes. Parece resolvido: é só deduplicar.
+
+**Mas a memória do time diz outra coisa:**
+
+```markdown
+# Pedido tem uma linha por mudança de status, não uma por pedido
+
+`bronze.pedidos` é append-only: cada mudança de status grava uma linha nova
+com o mesmo `pedido_id`. É intencional — o histórico atende requisito de
+auditoria, com retenção de 5 anos.
+
+**Consequência:** deduplicar por `pedido_id` apaga histórico legítimo.
+Duplicata de verdade é a repetição de (pedido_id, status, atualizado_em).
+
+**Decidido em:** 2025-08-12 · auditoria interna
+```
+
+Sem essa nota, o caminho natural é deduplicar por `pedido_id`. Corrige o dashboard,
+passa em qualquer teste de contagem — **e destrói cinco anos de trilha de auditoria**.
+O estrago só aparece meses depois, quando alguém pede o histórico de um pedido.
+
+### ② Especificar
+
+```markdown
+## Problema
+Reprocessamento do lote de 2026-06-14 gravou linhas repetidas em bronze.pedidos.
+O agregado de faturamento conta essas repetições.
+
+## Regras
+- Duplicata = mesma tupla (pedido_id, status, atualizado_em)
+- Linhas com mesmo pedido_id e status DIFERENTES são histórico: preservar
+- Manter a linha de maior ingested_at em caso de empate exato
+- A camada bronze NÃO é alterada; a correção vive na transformação para silver
+
+## Fora de escopo
+- Qualquer DELETE em bronze (append-only por requisito de auditoria)
+- A regra de retenção de 5 anos
+- Outras tabelas do mesmo pipeline
+
+## Aceite
+- [ ] Pedido com 3 status distintos → 3 linhas sobrevivem
+- [ ] Linha idêntica ingerida 2x → sobra 1
+- [ ] Contagem de pedidos distintos não muda antes/depois
+- [ ] Total de faturamento bate com o fechamento contábil de junho
+```
+
+### ③ Triagem
+
+Escopo fechado ✅ · teste que prova ✅ · sem decisão de produto ✅ · dado não sensível
+✅ · sei revisar ✅ → **delega.**
+
+### ④ O erro previsível
+
+O que volta sem a spec, em qualquer dialeto:
+
+```sql
+-- ✕ apaga o histórico de status
+SELECT DISTINCT ON (pedido_id) *
+FROM bronze.pedidos
+ORDER BY pedido_id, ingested_at DESC
+```
+
+O que a spec produz:
+
+```sql
+-- ✓ deduplica a repetição real, preserva a trilha
+SELECT * EXCEPT (rn) FROM (
+  SELECT *,
+         ROW_NUMBER() OVER (
+           PARTITION BY pedido_id, status, atualizado_em
+           ORDER BY ingested_at DESC
+         ) AS rn
+  FROM bronze.pedidos
+) WHERE rn = 1
+```
+
+A diferença cabe numa linha: **o que entra no `PARTITION BY`**. É a tradução técnica de
+uma regra de negócio que não está em lugar nenhum do código.
+
+### ⑤ Verificar
+
+Os dois testes que separam certo de errado:
+
+```sql
+-- histórico preservado: mesmo pedido, três status → três linhas
+-- reprocessamento removido: linha idêntica duas vezes → uma linha
+```
+
+Um teste só de contagem total **aprova as duas versões**. É preciso testar o caso de
+histórico explicitamente — e é isso que o critério de aceite força.
+
+### Como conduzir o hands-on — 40 min
+
+| Tempo | O que a squad faz |
+|---|---|
+| 5 min | Recebe só o pedido vago. Ninguém abre o editor |
+| 10 min | Escreve a spec: o que é duplicata, o que é histórico, o que fica fora |
+| 5 min | Triagem das cinco perguntas |
+| 10 min | Delega com a tarefa escrita e recebe o resultado |
+| 10 min | Review com o checklist, e a discussão do que aconteceria sem a nota |
+
+> **Divida a turma:** metade recebe a nota de memória, metade não. Os dois grupos
+> entregam código que passa no teste de contagem. Só um preserva a auditoria. Isso
+> demonstra a §5 melhor que qualquer slide.
+
+### Adaptação por stack
+
+A lógica não muda; muda o vocabulário.
+
+| Stack | Como aparece |
+|---|---|
+| **SQL puro** (Postgres, Snowflake, BigQuery) | `ROW_NUMBER() OVER (PARTITION BY ...)` como acima |
+| **PySpark** | `dropDuplicates(["pedido_id","status","atualizado_em"])` — o erro é omitir o `subset` |
+| **dbt** | `unique_key` do modelo incremental, ou `snapshot` com `check_cols` |
+| **pandas** | `drop_duplicates(subset=[...], keep="last")` |
+
+Em todas, o erro é o mesmo: **usar a chave técnica onde a regra pede a chave de
+negócio**. Só a memória do time distingue as duas.
+
+### Variações, se o domínio não couber
+
+- **Dado que chega atrasado** — *"o número de ontem mudou hoje"*. Armadilha: a régua de
+  fechamento D+2 vem do financeiro, não é escolha técnica.
+- **Evolução de schema** — fornecedor mudou o tipo de uma coluna. Armadilha: cast
+  silencioso em valor monetário perde centavos, e é a primeira saída que o agente propõe.
+- **Join que come linhas** — *"uma região sumiu do relatório"*. Armadilha: região sem
+  venda deve aparecer com zero; sumir é erro de negócio, não de dado.
 
 ---
 
