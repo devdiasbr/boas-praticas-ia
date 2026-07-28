@@ -63,5 +63,10 @@ Passe estas três perguntas em cada linha do `CLAUDE.md`:
 ## Referência
 
 Documento completo: [`../README.md`](../README.md).
-Seções mais relevantes para esta estrutura: **§3** (spec), **§4** (skills e instrução),
-**§5** (memória), **§8** (delegação a agente autônomo).
+
+**Comece pelo Caso A.1**, que percorre uma tarefa real usando todos os arquivos desta
+estrutura em sequência — memória, spec, triagem, tarefa, review e registro. É a forma
+mais rápida de entender para que serve cada diretório.
+
+Seções mais relevantes: **§3** (spec), **§4** (skills e instrução), **§5** (memória),
+**§8** (delegação a agente autônomo).

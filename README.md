@@ -7,8 +7,8 @@ Material agnóstico de ferramenta. Vale para Claude, GPT, Gemini, Devin e o que 
 | Você é | Leia |
 |---|---|
 | Qualquer pessoa | Camada 0 |
-| Dev / engenheiro | Camada 0 + 1, Apêndice A (casos) |
-| Liderança / decisor | Camada 0 + 2, matriz da §8.1, Caso A.2 |
+| Dev / engenheiro | Camada 0 + 1, Apêndice A (casos) — comece pelo **A.1**, que mostra o fluxo inteiro |
+| Liderança / decisor | Camada 0 + 2, matriz da §8.1, Caso A.3 |
 | Precisa cortar custo | §14 (catálogo de técnicas, ordenado por impacto) |
 | Com pressa | Apêndice D (cheatsheet) |
 
@@ -56,7 +56,7 @@ Exemplos de código estão em Python por ser a stack mais comum entre as squads.
 
 | | Apêndice | Sobre |
 |---|---|---|
-| A | Casos ponta a ponta | Quatro narrativas do pedido ao desfecho |
+| A | Casos ponta a ponta | O fluxo completo (A.1) + quatro casos de decisão |
 | B | Antipadrões | Índice reverso de erros comuns |
 | C | Ferramentas | Equivalência entre produtos e categorias de apoio |
 | D | Cheatsheet | Uma página, para consulta rápida |
@@ -354,6 +354,8 @@ SPEC  →  PLANO  →  EXECUÇÃO  →  VERIFICAÇÃO
 ```
 
 Este ciclo pode ser imposto pelo harness em vez de depender de disciplina individual — é o que fazem os frameworks de processo do Apêndice C.2. A diferença prática: sem framework, o ciclo é seguido quando dá tempo; com framework, o agente não avança de etapa sem cumprir a anterior.
+
+> **Para ver o ciclo rodando numa tarefa real, com todos os artefatos:** Caso A.1.
 
 | Etapa | O que produz | Quem valida |
 |---|---|---|
@@ -1266,7 +1268,7 @@ A regra que organiza tudo: *a maior economia não está em gastar menos por cham
 | 1 | **Eliminar retrabalho com spec** | Sessões inteiras refeitas | Médio | §3, §8 |
 | 2 | **Contexto enxuto** — trecho, não arquivo | Input, em todo turno | Baixo | §1 |
 | 3 | **Modelo certo por tarefa** | Ordem de grandeza no preço unitário | Baixo | §10 |
-| 4 | **Não usar LLM onde não cabe** | A chamada inteira | Baixo | Apêndice B, Caso A.4 |
+| 4 | **Não usar LLM onde não cabe** | A chamada inteira | Baixo | Apêndice B, Caso A.5 |
 | 5 | **Sessão nova quando o assunto muda** | Acúmulo composto de histórico | Nenhum | §1 |
 
 **Sobre a #1:** parece gestão, não técnica, mas é a de maior retorno. Uma tarefa refeita três vezes custa mais que mil prompts otimizados. Comece por aqui.
@@ -1418,13 +1420,188 @@ Ele é a única camada que **adiciona** passos. Isso tem contrapartidas reais:
 
 # Apêndice A — Casos ponta a ponta
 
-Quatro casos em formato narrado: do pedido até o desfecho. Dois dão certo, dois dão errado — os que dão errado ensinam mais.
+Cinco casos em formato narrado, do pedido até o desfecho.
+
+O **A.1** percorre o fluxo inteiro numa tarefa só, mostrando como as peças se conectam — é o que ler primeiro. Os quatro seguintes isolam uma decisão cada; dois dão certo, dois dão errado, e os que dão errado ensinam mais.
 
 > **Estes casos são ilustrativos**, construídos para demonstrar o padrão de decisão — não são registros de projetos executados. Substitua-os por casos reais das squads assim que houver material: exemplo de casa convence mais e envelhece melhor.
 
 ---
 
-## A.1 · Bug com repro → **delegado** ✅
+## A.1 · O fluxo completo, do pedido ao registro
+
+*Os outros quatro casos isolam uma decisão cada. Este mostra as peças conectadas — memória, spec, triagem, tarefa, review e registro — numa tarefa só.*
+
+**O pedido, como ele chega:**
+
+> *"O pessoal do suporte tá reclamando que o cancelamento não funciona direito. Dá uma olhada?"*
+
+Duas palavras fazem todo o trabalho aqui: **"não funciona direito"**. Não dizem se é bug, regra mal comunicada ou expectativa errada do cliente. Quem pula direto para o código escolhe uma dessas três por conta própria.
+
+---
+
+### ① Entender — 20 min
+
+**Primeiro a memória, depois o código.** O vault do time responde antes do repositório:
+
+```markdown
+# Janela de cancelamento são 30 minutos
+
+Pedido Antecipado (PA) pode ser cancelado sem multa em até 30 min após a criação.
+
+**Por quê:** prazo definido pelo jurídico no contrato com o cliente corporativo.
+Não é decisão de produto — não pode ser alterado por conveniência técnica.
+
+**Decidido em:** 2025-11-03 · Contrato §7.2
+```
+
+Isso muda tudo. Sem essa nota, "não funciona direito" poderia virar *"vamos aumentar a tolerância"* — e a squad alteraria uma cláusula contratual achando que estava corrigindo um bug.
+
+Com o contexto na mão, dois problemas distintos aparecem nos tickets:
+
+| Sintoma relatado | O que é de fato |
+|---|---|
+| "Cancelei em 25 min e recusou" | **Bug real** — a janela compara `datetime.now()` (UTC no servidor) com `criado_em` gravado em horário local. Em parte do dia, corta antes dos 30 min |
+| "A mensagem não explica nada" | **Não é bug** — é texto de erro genérico. Backlog de outra squad |
+
+**Decisão da etapa:** tratar só o bug. O texto vira ticket separado.
+
+---
+
+### ② Especificar — 15 min
+
+`docs/specs/2026-07-28-janela-cancelamento-timezone.md`
+
+```markdown
+# Janela de cancelamento respeita fuso corretamente
+
+## Problema
+`pode_cancelar()` compara datetime.now() (UTC) com pedido.criado_em (America/Sao_Paulo).
+Resultado: entre 21h e 00h BRT a janela fecha ~3h antes. 14 tickets no mês.
+
+## Regras
+- Ambos os lados da comparação em UTC, com timezone explícito
+- Janela permanece 30 minutos — valor contratual, NÃO alterar
+- Pedido criado antes do deploy continua válido pela regra antiga
+
+## Fora de escopo
+- O valor de 30 minutos (cláusula contratual §7.2)
+- A mensagem de erro (ticket SUP-4502, outra squad)
+- Qualquer outro cálculo de data no módulo
+
+## Aceite
+- [ ] Teste: pedido criado 21h30 BRT, cancelado 21h50 BRT → permitido
+- [ ] Teste: pedido criado 21h30 BRT, cancelado 22h05 BRT → recusado
+- [ ] Teste: mesma verificação passando por virada de dia
+- [ ] `make test` passa · `make check` limpo
+- [ ] Nenhuma dependência nova
+```
+
+> O bloco **Fora de escopo** com a cláusula contratual é o que impede a correção de virar incidente jurídico. Custou uma linha.
+
+---
+
+### ③ Triagem — 2 min
+
+| Pergunta | |
+|---|---|
+| Escopo fechado e escrito? | ✅ a spec acima |
+| Teste que prova o resultado? | ✅ os três casos de aceite |
+| Livre de decisão de arquitetura ou produto? | ✅ é correção de comparação |
+| Código não sensível? | ✅ não é auth, pagamento nem dado pessoal |
+| Sei revisar? | ✅ |
+
+**Cinco sim → delega.** Tempo até aqui: 37 minutos, nenhuma linha de código escrita.
+
+---
+
+### ④ Executar — tarefa e PR
+
+A tarefa reaproveita a spec, acrescentando só o que o agente precisa para agir:
+
+```markdown
+## Objetivo
+Corrigir a comparação de fuso em pode_cancelar(), mantendo a janela de 30 minutos.
+
+## Escopo
+IN:  app/pedidos/regras.py, tests/pedidos/test_janela.py
+OUT: o valor de 30 minutos  ← contratual, não altere em hipótese alguma
+     qualquer outro cálculo de data no módulo
+     requirements.txt
+
+## Ponto de partida
+- `app/pedidos/regras.py:74` — função pode_cancelar()
+- Repro: `pytest tests/pedidos/test_janela.py::test_noite` (escrito, falhando)
+
+## Se travar
+Pare e abra rascunho. Não altere a regra de negócio para fazer o teste passar.
+```
+
+---
+
+### ⑤ Verificar — 12 min
+
+O PR volta com 2 arquivos e 11 linhas. O checklist pega uma coisa:
+
+```python
+- JANELA = timedelta(minutes=30)
++ JANELA = timedelta(minutes=31)   # margem de segurança para latência
+```
+
+A correção de fuso está certa. Mas o agente aproveitou para adicionar um minuto de folga — decisão razoável em qualquer outro contexto, e **proibida neste**: 30 minutos é cláusula contratual.
+
+Repare que o agente não tinha como saber disso pelo código. Ele sabia porque estava escrito em `OUT`, e mesmo assim tentou. **Por isso o review existe.**
+
+Correção pedida, PR reaberto, aprovado. Total de review: 12 minutos.
+
+---
+
+### ⑥ Registrar — 5 min
+
+O que ficou verdadeiro e não está no código vai para a memória:
+
+```markdown
+# Datas de pedido são gravadas em horário local, não UTC
+
+A coluna `pedidos.criado_em` guarda America/Sao_Paulo sem timezone, por decisão de
+2023 que não vale a pena reverter agora (migração de 40M linhas).
+
+**Consequência prática:** qualquer comparação com datetime.now() precisa converter
+explicitamente. Já causou o bug da janela de cancelamento (SUP-4471, jul/2026).
+
+**Decidido em:** 2026-07-28 · **Revisar se:** a migração da tabela for priorizada
+
+Relacionado: [[janela-cancelamento]]
+```
+
+A próxima pessoa que mexer em data neste módulo — ou o próximo agente — recebe isso de graça.
+
+---
+
+### A contabilidade
+
+| Etapa | Tempo |
+|---|---|
+| Entender (memória + tickets + código) | 20 min |
+| Especificar | 15 min |
+| Triagem | 2 min |
+| Executar | agente, em paralelo com outra tarefa |
+| Verificar | 12 min |
+| Registrar | 5 min |
+| **Total de tempo humano** | **54 min** |
+
+**O que fez a diferença, em ordem:**
+
+1. **A nota da memória**, que evitou "corrigir" uma cláusula contratual. Custou zero — já estava escrita.
+2. **O bloco Fora de escopo**, que transformou uma alteração perigosa em um item de review, e não em um deploy.
+3. **O teste escrito antes de delegar**, que deu ao agente um alvo objetivo e um sinal de parada.
+4. **O review de verdade**, que pegou os 31 minutos. Ler o diff rápido teria deixado passar — a linha tem comentário explicativo e parece cuidadosa.
+
+**O que teria acontecido sem o fluxo:** alguém abre `regras.py`, vê a comparação de datas, corrige, e de quebra aumenta a tolerância "porque estava no limite". Passa no CI, passa no review de carimbo, e a violação contratual só aparece quando o cliente reclamar — se reclamar.
+
+---
+
+## A.2 · Bug com repro → **delegado** ✅
 
 **Pedido original da squad:** *"o importador tá quebrando com célula vazia"*
 
@@ -1470,7 +1647,7 @@ Pare e abra rascunho. Não amplie o escopo.
 
 ---
 
-## A.2 · Feature ambígua → **delegada** ❌
+## A.3 · Feature ambígua → **delegada** ❌
 
 *Este é o caso para levar à liderança. É onde o orçamento evapora.*
 
@@ -1518,7 +1695,7 @@ E o vazamento não aparece na fatura da ferramenta — aparece no lead time, que
 
 ---
 
-## A.3 · Refactor amplo → **pilotado** ✅
+## A.4 · Refactor amplo → **pilotado** ✅
 
 **Pedido:** *"`services/pedidos.py` tem 1.900 linhas, ninguém aguenta mais mexer nisso"*
 
@@ -1557,7 +1734,7 @@ Sem código ainda.
 
 ---
 
-## A.4 · Análise de dados → **onde IA não é a ferramenta** ❌→✅
+## A.5 · Análise de dados → **onde IA não é a ferramenta** ❌→✅
 
 **Pedido:** *"qual foi o ticket médio por região no último trimestre?"*
 
