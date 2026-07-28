@@ -57,12 +57,25 @@ M = 0.72
 
 prs = Presentation(TEMPLATE)
 
-# ---------- remove os slides de exemplo do template ----------
+# ---------- mantem a CAPA PADRAO do template (slide 2) e remove o resto ----------
+# O template traz 9 slides de exemplo; o 2o e a capa oficial
+# ("Full Image, Full Innovation Curve"). Ela e preservada e editada,
+# nao recriada, para nao mexer em elemento de marca.
+CAPA_IDX = 1
 xml_slides = prs.slides._sldIdLst
-for sld in list(xml_slides):
+for i, sld in enumerate(list(xml_slides)):
+    if i == CAPA_IDX:
+        continue
     rId = sld.get('{http://schemas.openxmlformats.org/officeDocument/2006/relationships}id')
     prs.part.drop_rel(rId)
     xml_slides.remove(sld)
+CAPA = prs.slides[0]
+
+# A capa preservada ocupa 'slide2.xml'. Os slides novos que o python-pptx cria
+# sao numerados a partir de slide1.xml e colidiriam com ela, sobrescrevendo-a
+# no pacote. Move a capa para um numero alto antes de adicionar qualquer slide.
+from pptx.opc.packuri import PackURI
+CAPA.part.partname = PackURI('/ppt/slides/slide900.xml')
 
 # ---------- escolhe a familia de masters conforme o estilo ----------
 masters = prs.slide_masters
@@ -75,13 +88,11 @@ def lay(mi, nome):
 if DARK:
     L_TITULO  = lay(9,  "Title Only")
     L_SUB     = lay(9,  "Title, 1 Column Body Text")
-    L_DIV     = lay(8,  "No Innovation Curve")
-    L_CAPA    = lay(8,  "Full Innovation Curve")
+    L_DIV     = lay(13, "Smart Navy")
 else:
     L_TITULO  = lay(3,  "Title Only")
     L_SUB     = lay(3,  "Title, 1 Column Body Text")
-    L_DIV     = lay(2,  "No Innovation Curve")
-    L_CAPA    = lay(2,  "Full Innovation Curve")
+    L_DIV     = lay(13, "Future Blue")
 
 # ---------- helpers ----------
 def rgb(h): return RGBColor.from_string(h)
@@ -168,25 +179,35 @@ def divisor(letra, titulo_txt, sub):
     for ph in list(s.placeholders):
         if str(ph.placeholder_format.type).startswith(("TITLE", "BODY", "OBJECT", "SUBTITLE")):
             ph._element.getparent().remove(ph._element)
-    circulo(s, M, 2.55, 1.05, AZUL)
-    txt(s, letra, M, 2.55, 1.05, 1.05, size=34, font=FT, bold=True, cor=BRANCO,
+    circulo(s, M, 2.55, 1.05, BRANCO)
+    txt(s, letra, M, 2.55, 1.05, 1.05, size=34, font=FT, bold=True, cor=AZUL_E,
         align=PP_ALIGN.CENTER, anchor=MSO_ANCHOR.MIDDLE)
-    txt(s, titulo_txt, M + 1.5, 2.62, W - M - 2.2, 0.8, size=32, font=FT, bold=True, cor=TEXTO)
-    txt(s, sub, M + 1.5, 3.5, W - M - 2.2, 0.5, size=14.5, cor=MUTED, italic=True)
+    txt(s, titulo_txt, M + 1.5, 2.62, W - M - 2.2, 0.8, size=32, font=FT, bold=True, cor=BRANCO)
+    txt(s, sub, M + 1.5, 3.5, W - M - 2.2, 0.5, size=14.5, cor="D6E9F7", italic=True)
     return s
 
 # =====================================================================
-# 1 CAPA
-s = prs.slides.add_slide(L_CAPA)
-for ph in list(s.placeholders):
-    if str(ph.placeholder_format.type).startswith(("TITLE", "BODY", "OBJECT", "SUBTITLE")):
-        ph._element.getparent().remove(ph._element)
-txt(s, "Como eu uso IA", M, 2.15, 9.6, 0.9, size=42, font=FT, bold=True, cor=TEXTO)
-txt(s, "no dia a dia", M, 3.02, 9.6, 0.9, size=42, font=FT, bold=True, cor=AZUL)
-txt(s, "Práticas que funcionam — contadas pelo caminho que eu fiz até elas",
-    M, 4.1, 9.6, 0.5, size=15, cor=MUTED)
-txt(s, "Bruno Dias  ·  <squad>  ·  <data>", M, 5.0, 8, 0.4, size=12, cor=MUTED)
-notas(s, "Enquadramento: isto nao e treinamento de ferramenta. Metade do tempo e de voces: 30 min de fala, 30 de conversa.")
+# 1 CAPA  (slide padrao do template, apenas preenchido)
+SEP = chr(10)
+
+def preencher_ph(slide, idx, texto, size, font, bold=False, cor=None):
+    for ph in slide.placeholders:
+        if ph.placeholder_format.idx == idx:
+            tf = ph.text_frame
+            tf.clear()
+            linhas = texto.split(SEP)
+            for i, ln in enumerate(linhas):
+                p = tf.paragraphs[0] if i == 0 else tf.add_paragraph()
+                r = p.add_run(); r.text = ln
+                r.font.name = font; r.font.size = Pt(size); r.font.bold = bold
+                if cor: r.font.color.rgb = rgb(cor)
+            return True
+    return False
+
+preencher_ph(CAPA, 0,  "Como eu uso IA" + SEP + "no dia a dia", 34, FT, True, BRANCO)
+preencher_ph(CAPA, 11, "Práticas que funcionam — contadas pelo" + SEP +
+                       "caminho que eu fiz até elas", 13, FB, False, BRANCO)
+notas(CAPA, "Enquadramento: isto nao e treinamento de ferramenta. Metade do tempo e de voces: 30 min de fala, 30 de conversa.")
 
 # 2 O QUE E / NAO E
 s = novo(L_TITULO, "O que esta conversa é")
