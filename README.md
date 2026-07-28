@@ -16,6 +16,8 @@ As seções da **Camada 1** seguem o mesmo padrão: *Princípio → Por quê →
 
 Exemplos de código estão em Python por ser a stack mais comum entre as squads. O princípio vale igual em qualquer linguagem.
 
+> **Para aplicar isto num projeto**, use o esqueleto pronto em [`template/`](template/) — `CLAUDE.md`, memória, specs, ADRs e templates de tarefa e de skill. É este documento transformado em estrutura de repositório.
+
 ---
 
 ## Sumário
