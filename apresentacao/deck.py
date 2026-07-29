@@ -232,47 +232,86 @@ s = novo(L_TITULO, "Três erros que custam caro",
 itens = [("Colar tudo", "Log inteiro, arquivo inteiro, “por precaução”.\nA intuição de que mais contexto = melhor resposta."),
          ("Pedir vago", "“Otimiza isso aí.”\nVolta algo legítimo que não dá para usar."),
          ("Aceitar o que vem", "Bem escrito, parece certo, ninguém roda.\nAparece no review — ou em produção.")]
-y = 2.05
+# tres cartoes lado a lado, numero em faixa no topo
+cw, cgap, cy = 3.82, 0.33, 2.0
+cx = M
 for i, (t1, t2) in enumerate(itens, 1):
-    circulo(s, M, y, 0.46, ERRO)
-    txt(s, str(i), M, y, 0.46, 0.46, size=13, bold=True, cor=BRANCO,
-        align=PP_ALIGN.CENTER, anchor=MSO_ANCHOR.MIDDLE)
-    txt(s, t1, M + 0.72, y - 0.02, 3.3, 0.4, size=16, bold=True)
-    txt(s, t2, M + 4.1, y - 0.04, 7.4, 0.8, size=12.5, cor=MUTED, space=1.25)
-    y += 1.18
+    card(s, cx, cy, cw, 2.45, SUAVE)
+    circulo(s, cx + cw / 2 - 0.26, cy + 0.24, 0.52, ERRO)
+    txt(s, str(i), cx + cw / 2 - 0.26, cy + 0.24, 0.52, 0.52, size=15, bold=True,
+        cor=BRANCO, align=PP_ALIGN.CENTER, anchor=MSO_ANCHOR.MIDDLE)
+    txt(s, t1, cx + 0.28, cy + 0.95, cw - 0.56, 0.4, size=16, font=FT, bold=True,
+        align=PP_ALIGN.CENTER)
+    txt(s, t2, cx + 0.28, cy + 1.45, cw - 0.56, 0.85, size=12, cor=MUTED,
+        align=PP_ALIGN.CENTER, space=1.3)
+    cx += cw + cgap
 rodape(s, "Nenhum dos três é sobre a ferramenta. Os três são sobre método.")
 notas(s, "Contar um caso real curto de um dos tres. Vulnerabilidade primeiro.")
 
 # 4 GARGALO
 s = novo(L_TITULO, "O gargalo mudou de lugar")
-txt(s, "Escrever código deixou de ser o gargalo.", M, 2.2, 11.8, 0.6, size=25, font=FT)
-txt(s, "Decidir o que deve ser construído virou o gargalo.", M, 2.95, 11.8, 0.6,
-    size=25, font=FT, bold=True, cor=AZUL)
+# ANTES | AGORA lado a lado
+gw = 5.85
+card(s, M, 1.9, gw, 2.1, SUAVE)
+txt(s, "ANTES", M + 0.3, 2.12, gw - 0.6, 0.32, size=12, bold=True, cor=MUTED)
+txt(s, "Escrever código\nera o gargalo.", M + 0.3, 2.6, gw - 0.6, 1.1,
+    size=22, font=FT, space=1.2)
+
+card(s, M + gw + 0.35, 1.9, gw, 2.1, AZUL)
+txt(s, "AGORA", M + gw + 0.65, 2.12, gw - 0.6, 0.32, size=12, bold=True, cor="CFE6F7")
+txt(s, "Decidir o que deve\nser construído.", M + gw + 0.65, 2.6, gw - 0.6, 1.1,
+    size=22, font=FT, bold=True, cor=BRANCO, space=1.2)
+
 txt(s, "Quando ninguém decide, o modelo decide — por omissão, com confiança.\nE isso só aparece no code review.",
-    M, 4.2, 11.4, 0.9, size=15, cor=MUTED, space=1.35)
+    M, 4.4, 11.4, 0.9, size=15, cor=MUTED, space=1.35)
 notas(s, "Slide central. Se levarem uma frase, e esta.")
 
 # 5 CICLO
 s = novo(L_TITULO, "O ciclo",
          "O mesmo, de tarefa pequena a feature grande — só muda o rigor de cada etapa")
-passos = [("ENTENDER", "ler antes\nde pedir"), ("ESPECIFICAR", "escrever o\ncritério"),
-          ("EXECUTAR", "pessoa ou\nagente"), ("VERIFICAR", "rodar, não\nler"),
-          ("REGISTRAR", "o que vale\npra próxima")]
-bw, gap, ytop = 2.12, 0.34, 2.35
-x = (W - (len(passos) * bw + (len(passos) - 1) * gap)) / 2
-for i, (a, b) in enumerate(passos):
+passos = [("ENTENDER", "ler antes de pedir"), ("ESPECIFICAR", "escrever o critério"),
+          ("EXECUTAR", "pessoa ou agente"), ("VERIFICAR", "rodar, não ler"),
+          ("REGISTRAR", "o que vale pra próxima")]
+
+# nos dispostos em circulo: a disposicao e que comunica que o ciclo volta
+import math
+CX, CY, RAIO, D = 3.75, 3.85, 1.42, 0.82
+pos = []
+for i in range(len(passos)):
+    ang = math.radians(-90 + i * (360.0 / len(passos)))
+    pos.append((CX + RAIO * math.cos(ang) - D / 2, CY + RAIO * math.sin(ang) - D / 2))
+
+# anel de fundo, sugerindo continuidade
+anel = s.shapes.add_shape(MSO_SHAPE.DONUT, Inches(CX - RAIO - D / 2 + 0.06),
+                          Inches(CY - RAIO - D / 2 + 0.06),
+                          Inches((RAIO + D / 2 - 0.06) * 2), Inches((RAIO + D / 2 - 0.06) * 2))
+anel.adjustments[0] = 0.035
+anel.fill.solid(); anel.fill.fore_color.rgb = rgb(CINZA_C)
+anel.line.fill.background(); anel.shadow.inherit = False
+
+for i, (x, y) in enumerate(pos):
     dest = (i == 1)
-    card(s, x, ytop, bw, 1.7, AZUL if dest else SUAVE, AZUL if dest else None)
-    txt(s, a, x, ytop + 0.28, bw, 0.34, size=12, bold=True,
-        cor=BRANCO if dest else TEXTO, align=PP_ALIGN.CENTER)
-    txt(s, b, x, ytop + 0.72, bw, 0.7, size=11, cor=BRANCO if dest else MUTED,
-        align=PP_ALIGN.CENTER, space=1.2)
-    if i < len(passos) - 1:
-        txt(s, "→", x + bw, ytop + 0.6, gap, 0.45, size=15, cor=CINZA,
-            align=PP_ALIGN.CENTER, anchor=MSO_ANCHOR.MIDDLE)
-    x += bw + gap
+    circulo(s, x, y, D, AZUL if dest else BRANCO)
+    if not dest:
+        c = s.shapes[-1]
+        c.line.color.rgb = rgb(AZUL); c.line.width = Pt(1.5)
+    txt(s, str(i + 1), x, y, D, D, size=17, font=FT, bold=True,
+        cor=BRANCO if dest else AZUL_E, align=PP_ALIGN.CENTER, anchor=MSO_ANCHOR.MIDDLE)
+
+# legenda a direita
+ly = 2.35
+for i, (nome, desc) in enumerate(passos):
+    dest = (i == 1)
+    circulo(s, 6.9, ly + 0.03, 0.34, AZUL if dest else CINZA_C)
+    txt(s, str(i + 1), 6.9, ly + 0.03, 0.34, 0.34, size=11, bold=True,
+        cor=BRANCO if dest else GRAFITE, align=PP_ALIGN.CENTER, anchor=MSO_ANCHOR.MIDDLE)
+    txt(s, nome, 7.4, ly, 2.5, 0.32, size=13, bold=True,
+        cor=AZUL_E if dest else TEXTO)
+    txt(s, desc, 9.9, ly + 0.02, 2.8, 0.32, size=12, cor=MUTED)
+    ly += 0.62
+
 txt(s, "A etapa 2 é a que mais se pula — e a única que, quando falha, estraga todas as outras.",
-    M, 4.5, W - 2 * M, 0.5, size=15, italic=True)
+    M, 5.75, W - 2 * M, 0.5, size=15, italic=True)
 rodape(s, "O atalho comum — e o meu, por muito tempo: pular de “tenho um problema” direto para “escreve o código”.")
 notas(s, "Mostrar que o ciclo nao e cerimonia: em tarefa pequena cada etapa leva segundos.")
 
@@ -300,10 +339,21 @@ card(s, M, 2.1, W - 2 * M, 1.9, SUAVE)
 txt(s, "O que pedir antes de abrir uma sessão nova:", M + 0.32, 2.3, 10, 0.34, size=13, bold=True)
 txt(s, "“Escreva um resumo de estado em até 20 linhas: decisões tomadas e o porquê,\ndecisões que DESCARTAMOS e o motivo, arquivos alterados, o que está pendente.”",
     M + 0.32, 2.74, 11.4, 1.0, size=12, font=FM, space=1.3)
-txt(s, "~90.000 tokens de histórico  →  ~600 de estado útil", M, 4.3, W - 2 * M, 0.5,
-    size=18, bold=True, cor=AZUL)
-txt(s, "O bloco de decisões descartadas é o que mais economiza: sem ele, a sessão nova propõe de novo tudo que já tinha sido recusado.",
-    M, 4.95, 11.5, 0.7, size=13.5, cor=MUTED, space=1.3)
+# dois cartoes de numero grande, com a seta entre eles
+sw = 4.6
+card(s, M, 4.25, sw, 1.35, SUAVE)
+txt(s, "~90.000", M + 0.3, 4.45, sw - 0.6, 0.55, size=28, font=FT, bold=True, cor=MUTED)
+txt(s, "tokens de histórico acumulado", M + 0.3, 5.05, sw - 0.6, 0.3, size=12, cor=MUTED)
+
+txt(s, "→", M + sw, 4.65, 0.9, 0.5, size=24, cor=CINZA,
+    align=PP_ALIGN.CENTER, anchor=MSO_ANCHOR.MIDDLE)
+
+card(s, M + sw + 0.9, 4.25, sw, 1.35, AZUL)
+txt(s, "~600", M + sw + 1.2, 4.45, sw - 0.6, 0.55, size=28, font=FT, bold=True, cor=BRANCO)
+txt(s, "tokens de estado útil", M + sw + 1.2, 5.05, sw - 0.6, 0.3, size=12, cor="CFE6F7")
+
+txt(s, "O bloco de decisões descartadas é o que mais economiza: sem ele, a sessão nova\npropõe de novo tudo que já tinha sido recusado.",
+    M, 5.85, 11.5, 0.7, size=13, cor=MUTED, space=1.3)
 notas(s, "Sugerir que testem hoje numa conversa longa que ja esteja aberta.")
 
 # 9 DIVISOR B
