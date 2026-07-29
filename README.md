@@ -429,6 +429,11 @@ Repetir apenas erros transitórios, com espera crescente, e desistir com erro cl
 
 Trinta linhas. O bloco **Fora de escopo** e o item "POST não é repetido" são o que separa a correção do incidente — e nenhum dos dois o modelo tinha como adivinhar.
 
+> **Se você usa um framework de processo, a spec já sai dele.** Não escreva uma segunda
+> num template paralelo — duas cópias divergem em uma semana. Valide a que existe: o que
+> costuma faltar não é seção, é o bloco *Fora de escopo* e um critério de aceite que se
+> verifica por comando.
+
 > **SDD é pré-requisito da §8.** Delegar tarefa a um agente autônomo sem spec é o modo mais eficiente de queimar orçamento.
 
 ---
@@ -1454,6 +1459,21 @@ MEDIR         → observabilidade de custo (não economiza nada; instrumenta tud
 > **E o principal:** nenhuma camada de *compressão* resolve **retrabalho por spec ruim**, **custo de agente autônomo** (ACU não é token) ou **escolha errada de modelo**. Essas são as três maiores alavancas da §14 — e todas as três são método.
 >
 > É exatamente por isso que o **framework de processo** ocupa um lugar diferente na stack: ele é a tentativa de empacotar método como ferramenta. Método continua sendo método; o que o framework faz é tirá-lo da disciplina individual (que varia por pessoa, por dia e por pressão de prazo) e colocá-lo no harness (§7), onde é aplicado igual, sempre. Nenhuma das outras camadas faz isso.
+
+### O que o framework de processo não cobre
+
+Eles conduzem brainstorming, spec, plano, TDD e code review — e assumem que **você**
+executa, com subagentes. Três lacunas ficam de fora, e são justamente as que aparecem
+quando o time usa agente autônomo externo:
+
+| Lacuna | Por que importa |
+|---|---|
+| **Triagem: delegar ou pilotar** | Sem critério, delega-se o ambíguo — e é onde o orçamento evapora (§8.1) |
+| **Tarefa para agente autônomo** | O framework não escreve chamado para quem não pode perguntar (§8.2) |
+| **Memória entre sessões** | Nada persiste o que ficou verdadeiro e não está no código (§5) |
+
+Preencha essas três com o que for seu, mas **não duplique o que o framework já faz**.
+Spec escrita duas vezes, em dois formatos, é a receita para as duas divergirem.
 
 ### O risco específico do framework de processo
 

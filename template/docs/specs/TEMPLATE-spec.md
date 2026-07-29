@@ -1,6 +1,10 @@
 # <Título: o comportamento esperado, não a tarefa>
 
 <!--
+USE ESTE ARQUIVO SOMENTE se você não usa um framework de processo que já escreve a
+spec (Superpowers e similares escrevem). Se usa, não crie uma spec paralela — valide
+a que o framework gerou com o CHECKLIST-spec.md ao lado.
+
 Nome do arquivo: AAAA-MM-DD-assunto.md
 
 A spec é a fonte de verdade. O código é saída dela.
