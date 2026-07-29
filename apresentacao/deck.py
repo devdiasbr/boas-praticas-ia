@@ -515,11 +515,32 @@ notas(s, "Perguntar em qual coluna cai o que eles delegam hoje.")
 # 18 REVIEW
 s = novo(L_TITULO, "Um PR que passa no CI e não deve ser aprovado")
 card(s, M, 1.72, 6.5, 2.9, NAVY if not DARK else "16203A")
-txt(s, "  def parse_row(row) -> int | None:\n-     return int(row[\"quantidade\"])\n+     try:\n+         return int(row[\"quantidade\"])\n+     except Exception:\n+         return None\n\n- def test_invalido():\n-     with pytest.raises(ValueError):\n+ def test_invalido():\n+     assert parse_row(\"abc\") is None",
-    M + 0.28, 1.95, 5.9, 2.45, size=10, font=FM, cor=BRANCO, space=1.15)
+# cores de diff sobre fundo escuro
+DIFF_CTX, DIFF_DEL, DIFF_ADD = "C7D0DC", "FF6B4A", "38F990"
+txt_rico(s, [
+    [("  def parse_row(row) -> int | None:", DIFF_CTX)],
+    [("-     return int(row[\"quantidade\"])", DIFF_DEL)],
+    [("+     try:", DIFF_ADD)],
+    [("+         return int(row[\"quantidade\"])", DIFF_ADD)],
+    [("+     except Exception:", DIFF_ADD)],
+    [("+         return None", DIFF_ADD)],
+    [("", None)],
+    [("- def test_invalido():", DIFF_DEL)],
+    [("-     with pytest.raises(ValueError):", DIFF_DEL)],
+    [("+ def test_invalido():", DIFF_ADD)],
+    [("+     assert parse_row(\"abc\") is None", DIFF_ADD)],
+], M + 0.28, 1.95, 5.9, 2.45, size=10, space=1.15)
+
 txt(s, "CI verde. Três problemas:", M + 7.0, 1.76, 4.9, 0.4, size=15, bold=True)
-txt(s, "•  except Exception engole tudo — coluna faltando vira None silencioso\n\n•  o teste antigo foi invertido para passar\n\n•  e tem um parâmetro de biblioteca que simplesmente não existe",
-    M + 7.0, 2.3, 4.9, 2.2, size=12, cor=MUTED, space=1.2)
+txt_rico(s, [
+    [("•  ", CINZA), ("except Exception", ERRO), (" engole tudo — coluna", MUTED)],
+    [("   faltando vira None silencioso", MUTED)],
+    [("", None)],
+    [("•  ", CINZA), ("o teste antigo foi invertido", ERRO), (" para passar", MUTED)],
+    [("", None)],
+    [("•  ", CINZA), ("e tem um parâmetro de biblioteca", MUTED)],
+    [("   que simplesmente não existe", MUTED)],
+], M + 7.0, 2.3, 4.9, 2.2, size=12, font=FB, space=1.25)
 txt(s, "Ler o diff não é revisar. O segundo item é o mais grave e o mais fácil de passar batido.",
     M, 4.8, W - 2 * M, 0.45, size=15, bold=True)
 txt(s, "Atalho: git diff nos testes primeiro. Linha alterada em teste existente exige justificativa escrita.",
