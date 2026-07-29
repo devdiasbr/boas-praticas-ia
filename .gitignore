@@ -4,3 +4,4 @@ slide-*.jpg
 graphify-out/
 __pycache__/
 .pytest_cache/
+~$*
