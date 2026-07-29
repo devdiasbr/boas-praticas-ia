@@ -120,6 +120,24 @@ def txt(slide, s, x, y, w, h, size=14, font=FB, cor=None, bold=False,
         f.color.rgb = rgb(cor or TEXTO)
     return tb
 
+def txt_rico(slide, linhas, x, y, w, h, size=11, font=FM, space=1.15):
+    """linhas = lista de listas de (trecho, cor). Uma lista interna por linha."""
+    tb = add(slide, x, y, w, h)
+    tf = tb.text_frame
+    tf.word_wrap = True
+    tf.margin_left = tf.margin_right = tf.margin_top = tf.margin_bottom = 0
+    for i, partes in enumerate(linhas):
+        p = tf.paragraphs[0] if i == 0 else tf.add_paragraph()
+        p.line_spacing = space
+        if isinstance(partes, str):
+            partes = [(partes, None)]
+        for trecho, cor in partes:
+            r = p.add_run(); r.text = trecho
+            r.font.name = font; r.font.size = Pt(size)
+            r.font.color.rgb = rgb(cor or TEXTO)
+    return tb
+
+
 def card(slide, x, y, w, h, fill, line=None):
     sh = slide.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE,
                                 Inches(x), Inches(y), Inches(w), Inches(h))
@@ -159,6 +177,15 @@ def novo(layout, titulo_txt=None, sub=None):
     if sub:
         txt(s, sub, M, 1.42, W - 2 * M, 0.4, size=13.5, cor=MUTED, italic=True)
     return s
+
+def bloco_vazio(s, x, y, w, h, marca, titulo, cor, fill, borda):
+    """Cartao com cabecalho, sem corpo — o conteudo entra depois com txt_rico."""
+    card(s, x, y, w, h, fill, borda)
+    circulo(s, x + 0.26, y + 0.2, 0.32, cor)
+    txt(s, marca, x + 0.26, y + 0.2, 0.32, 0.32, size=11, bold=True, cor=BRANCO,
+        align=PP_ALIGN.CENTER, anchor=MSO_ANCHOR.MIDDLE)
+    txt(s, titulo, x + 0.68, y + 0.21, w - 0.94, 0.34, size=14, bold=True, cor=TEXTO)
+
 
 def bloco(s, x, y, w, h, marca, titulo, corpo, cor, fill, borda, mono=False, size=11.5):
     card(s, x, y, w, h, fill, borda)
@@ -273,45 +300,57 @@ passos = [("ENTENDER", "ler antes de pedir"), ("ESPECIFICAR", "escrever o crité
           ("EXECUTAR", "pessoa ou agente"), ("VERIFICAR", "rodar, não ler"),
           ("REGISTRAR", "o que vale pra próxima")]
 
-# nos dispostos em circulo: a disposicao e que comunica que o ciclo volta
 import math
-CX, CY, RAIO, D = 3.75, 3.85, 1.42, 0.82
-pos = []
-for i in range(len(passos)):
-    ang = math.radians(-90 + i * (360.0 / len(passos)))
-    pos.append((CX + RAIO * math.cos(ang) - D / 2, CY + RAIO * math.sin(ang) - D / 2))
 
-# anel de fundo, sugerindo continuidade
-anel = s.shapes.add_shape(MSO_SHAPE.DONUT, Inches(CX - RAIO - D / 2 + 0.06),
-                          Inches(CY - RAIO - D / 2 + 0.06),
-                          Inches((RAIO + D / 2 - 0.06) * 2), Inches((RAIO + D / 2 - 0.06) * 2))
-anel.adjustments[0] = 0.035
-anel.fill.solid(); anel.fill.fore_color.rgb = rgb(CINZA_C)
-anel.line.fill.background(); anel.shadow.inherit = False
+# anel de 5 segmentos coloridos: progressao Future Blue -> Turquoise
+TONS = ["0055B6", "0072BC", "19A3FC", "00C3E0", "7BF7FF"]
+CX, CY, RAIO, D = 4.05, 3.75, 1.62, 1.34
+N = len(passos)
+PASSO = 360.0 / N
 
-for i, (x, y) in enumerate(pos):
+for i in range(N):
+    ini = -90 - PASSO / 2 + i * PASSO
+    arco = s.shapes.add_shape(MSO_SHAPE.BLOCK_ARC,
+                              Inches(CX - RAIO - 0.34), Inches(CY - RAIO - 0.34),
+                              Inches((RAIO + 0.34) * 2), Inches((RAIO + 0.34) * 2))
+    # blockArc guarda angulo em 1/60000 de grau; python-pptx grava o valor x100000,
+    # entao o fator e 60000/100000 = 0.6
+    arco.adjustments[0] = ini * 0.6
+    arco.adjustments[1] = (ini + PASSO - 3) * 0.6     # 3 graus de respiro
+    arco.adjustments[2] = 0.19                        # espessura do anel
+    arco.fill.solid(); arco.fill.fore_color.rgb = rgb(TONS[i])
+    arco.line.fill.background(); arco.shadow.inherit = False
+
+# nos por cima do anel, com o nome dentro
+for i, (nome, desc) in enumerate(passos):
+    ang = math.radians(-90 + i * PASSO)
+    x = CX + RAIO * math.cos(ang) - D / 2
+    y = CY + RAIO * math.sin(ang) - D / 2
     dest = (i == 1)
     circulo(s, x, y, D, AZUL if dest else BRANCO)
-    if not dest:
-        c = s.shapes[-1]
-        c.line.color.rgb = rgb(AZUL); c.line.width = Pt(1.5)
-    txt(s, str(i + 1), x, y, D, D, size=17, font=FT, bold=True,
-        cor=BRANCO if dest else AZUL_E, align=PP_ALIGN.CENTER, anchor=MSO_ANCHOR.MIDDLE)
+    aro = s.shapes[-1]
+    aro.line.color.rgb = rgb(TONS[i]); aro.line.width = Pt(2.5)
+    txt(s, nome, x + 0.04, y + 0.3, D - 0.08, 0.34, size=8.5, bold=True,
+        cor=BRANCO if dest else GRAFITE, align=PP_ALIGN.CENTER, anchor=MSO_ANCHOR.MIDDLE)
+    txt(s, str(i + 1), x + 0.04, y + 0.62, D - 0.08, 0.28, size=9,
+        cor="CFE6F7" if dest else CINZA, align=PP_ALIGN.CENTER, anchor=MSO_ANCHOR.MIDDLE)
+
+txt(s, "repete\na cada\ntarefa", CX - 0.75, CY - 0.42, 1.5, 0.9, size=11, font=FT,
+    italic=True, cor=MUTED, align=PP_ALIGN.CENTER, anchor=MSO_ANCHOR.MIDDLE, space=1.15)
 
 # legenda a direita
-ly = 2.35
+ly = 2.5
 for i, (nome, desc) in enumerate(passos):
     dest = (i == 1)
-    circulo(s, 6.9, ly + 0.03, 0.34, AZUL if dest else CINZA_C)
-    txt(s, str(i + 1), 6.9, ly + 0.03, 0.34, 0.34, size=11, bold=True,
-        cor=BRANCO if dest else GRAFITE, align=PP_ALIGN.CENTER, anchor=MSO_ANCHOR.MIDDLE)
-    txt(s, nome, 7.4, ly, 2.5, 0.32, size=13, bold=True,
-        cor=AZUL_E if dest else TEXTO)
-    txt(s, desc, 9.9, ly + 0.02, 2.8, 0.32, size=12, cor=MUTED)
-    ly += 0.62
+    circulo(s, 7.35, ly + 0.02, 0.3, TONS[i])
+    txt(s, str(i + 1), 7.35, ly + 0.02, 0.3, 0.3, size=10, bold=True,
+        cor=BRANCO if i < 3 else GRAFITE, align=PP_ALIGN.CENTER, anchor=MSO_ANCHOR.MIDDLE)
+    txt(s, nome, 7.82, ly, 2.3, 0.3, size=12.5, bold=True, cor=AZUL_E if dest else TEXTO)
+    txt(s, desc, 10.1, ly + 0.01, 2.6, 0.3, size=11.5, cor=MUTED)
+    ly += 0.58
 
 txt(s, "A etapa 2 é a que mais se pula — e a única que, quando falha, estraga todas as outras.",
-    M, 5.75, W - 2 * M, 0.5, size=15, italic=True)
+    M, 5.72, W - 2 * M, 0.5, size=15, italic=True)
 rodape(s, "O atalho comum — e o meu, por muito tempo: pular de “tenho um problema” direto para “escreve o código”.")
 notas(s, "Mostrar que o ciclo nao e cerimonia: em tarefa pequena cada etapa leva segundos.")
 
@@ -321,12 +360,32 @@ notas(divisor("A", "Antes de pedir", "A parte que acontece antes de digitar qual
 
 # 7 CONTEXTO
 s = novo(L_TITULO, "Contexto é orçamento, não depósito")
-bloco(s, M, 1.72, 5.8, 3.0, "✕", "Sem recorte",
-      "Aqui o log, me ajuda:\n\n09:14:02 INFO  Starting worker\n09:14:02 INFO  Connected redis\n  ... (1.847 linhas) ...\n09:31:55 ERROR ValueError: inva\n  ... (mais 600 linhas) ...",
-      ERRO, ERR_BG, BORDA_E, mono=True, size=10.5)
-bloco(s, M + 6.1, 1.72, 5.8, 3.0, "✓", "Com recorte",
-      "Erro no worker, ~2% dos registros.\n\nValueError: invalid literal\n  parser.py:42 in parse_row\n\nJá verifiquei: CSV tem células\nvazias. Schema não é meu.\n\nQuero vazio -> None, sem engolir\noutros erros.",
-      VERDE, OK_BG, BORDA_O, mono=True, size=10.5)
+TS, LOG_I, LOG_E, CODE, PROSA = CINZA, AZUL, ERRO, "6A3FA0", TEXTO
+
+bloco_vazio(s, M, 1.72, 5.8, 3.0, "✕", "Sem recorte", ERRO, ERR_BG, BORDA_E)
+txt_rico(s, [
+    [("Aqui o log, me ajuda:", PROSA)],
+    [("", None)],
+    [("09:14:02 ", TS), ("INFO ", LOG_I), (" Starting worker", PROSA)],
+    [("09:14:02 ", TS), ("INFO ", LOG_I), (" Connected redis", PROSA)],
+    [("  ... (1.847 linhas) ...", TS)],
+    [("09:31:55 ", TS), ("ERROR ", LOG_E), ("ValueError: inva", PROSA)],
+    [("  ... (mais 600 linhas) ...", TS)],
+], M + 0.26, 2.38, 5.3, 2.2, size=10.5)
+
+bloco_vazio(s, M + 6.1, 1.72, 5.8, 3.0, "✓", "Com recorte", VERDE, OK_BG, BORDA_O)
+txt_rico(s, [
+    [("Erro no worker, ~2% dos registros.", PROSA)],
+    [("", None)],
+    [("ValueError", LOG_E), (": invalid literal", PROSA)],
+    [("  parser.py:42", CODE), (" in ", PROSA), ("parse_row", CODE)],
+    [("", None)],
+    [("Já verifiquei: CSV tem células", PROSA)],
+    [("vazias. Schema não é meu.", PROSA)],
+    [("", None)],
+    [("Quero vazio ", PROSA), ("-> None", CODE), (", sem engolir", PROSA)],
+    [("outros erros.", PROSA)],
+], M + 6.36, 2.38, 5.3, 2.2, size=10.5)
 txt(s, "~40.000 tokens", M, 4.88, 5.8, 0.45, size=18, bold=True, cor=ERRO, align=PP_ALIGN.CENTER)
 txt(s, "~200 tokens · e resposta melhor", M + 6.1, 4.88, 5.8, 0.45, size=18, bold=True,
     cor=AZUL_E, align=PP_ALIGN.CENTER)
